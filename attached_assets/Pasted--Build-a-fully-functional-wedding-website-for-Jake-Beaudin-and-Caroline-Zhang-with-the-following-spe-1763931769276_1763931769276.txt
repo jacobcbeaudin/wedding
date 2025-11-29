@@ -1,0 +1,115 @@
+
+Build a fully functional wedding website for Jake Beaudin and Caroline Zhang with the following specifications:
+
+**EVENT DETAILS:**
+- Tea Ceremony: September 11, 2026
+- Welcome Party: September 11, 2026  
+- Wedding Ceremony: September 12, 2026 at Hyatt Highlands Carmel Inn
+
+**CORE FUNCTIONALITY:**
+
+1. **Guest List Management System (CRITICAL):**
+   - Create an admin interface to pre-populate guest list with:
+     - Guest name
+     - Email (optional)
+     - Unique invitation code (auto-generated)
+     - Which events they're invited to (tea ceremony, welcome party, wedding ceremony)
+     - Plus-one allowance (yes/no and how many)
+   - Store in database/JSON file
+
+2. **RSVP System with Guest Lookup:**
+   - **Guest Lookup:** Allow guests to search by name OR enter their unique invitation code
+   - Display personalized RSVP form showing ONLY the events they're invited to
+   - For each event they're invited to, allow them to:
+     - Accept or decline
+     - Specify number of guests attending (within their plus-one limit)
+     - Enter names of additional guests if bringing plus-ones
+   - Single food allergies/dietary restrictions field that applies to their entire party
+   - Confirmation page after submission
+   - Ability to edit/update RSVP by looking up their name again
+   - Admin dashboard to view all RSVPs organized by event
+
+3. **Event Information Pages:**
+   - Home page with couple's names, countdown timer to September 12, 2026
+   - Detailed schedule for all three events with times and dress code
+   - Venue information with embedded Google Maps for Hyatt Highlands Carmel Inn
+   - Travel & accommodation recommendations
+
+4. **Gift Section:**
+   - No registry - include clickable Venmo and PayPal buttons/links
+   - Heartfelt message about honeymoon fund or wishing well
+
+5. **Photo Gallery:**
+   - Grid/masonry layout for couple photos
+   - Easy to add more photos later
+   - Lightbox viewer for full-size images
+
+6. **FAQ Section:**
+   - Common questions like parking, attire, timeline, kids policy, etc.
+   - Accordion-style or simple Q&A format
+
+7. **Couple Trivia/Getting to Know Us:**
+   - Fun facts about Jake and Caroline
+   - "How We Met" story
+   - Favorite things, proposal story, etc.
+
+**DESIGN REQUIREMENTS (CRITICAL):**
+- **Aesthetic:** Retro 90s Geocities vibe - ironic, nostalgic, intentionally kitsch
+- **Typography:** Comic Sans MS as primary font throughout entire site
+- **Color Scheme:** Dusty blue (#9FB4C7 or similar palette) as dominant color with 90s accent colors (hot pink, lime green, etc.)
+- **Custom Cursor:** Pixelated otter cursor throughout site (create pixel art or use existing)
+- **90s Elements to include:**
+  - Tiled background patterns (starfield, geometric patterns)
+  - Marquee scrolling text for announcements
+  - Animated GIFs (sparkles, stars, hearts)
+  - "Under construction" aesthetic elements
+  - Rainbow horizontal dividers
+  - Guestbook-style RSVP form
+  - Visitor hit counter (functional or decorative)
+  - "Best viewed in Netscape Navigator" joke badge
+  - Blinking text (sparingly)
+  - Comic sans everywhere
+
+**TECHNICAL REQUIREMENTS:**
+- Responsive design (mobile and desktop friendly despite retro aesthetic)
+- Form validation for RSVP
+- Backend with Node.js/Express and database (SQLite or JSON storage)
+- Admin panel with password protection to:
+  - Add/edit guest list
+  - View all RSVPs
+  - Download RSVP data as CSV
+- Navigation menu to all sections (can be 90s-style button nav)
+- Contact form or email link for questions
+
+**PAGES/SECTIONS:**
+1. Home (with countdown timer)
+2. Our Story
+3. Events & Schedule  
+4. Travel & Stay
+5. RSVP (with guest lookup system)
+6. Gift Registry (Venmo/PayPal)
+7. Photos
+8. FAQ
+9. Getting to Know Us (Couple Trivia)
+10. Admin Panel (hidden/password protected)
+
+**DATA STRUCTURE EXAMPLE:**
+```javascript
+// Guest record example
+{
+  id: 1,
+  name: "John Smith",
+  invitationCode: "JS2026",
+  email: "john@email.com",
+  invitedTo: ["tea_ceremony", "welcome_party", "wedding_ceremony"],
+  plusOnes: 1,
+  rsvp: {
+    tea_ceremony: { attending: true, guestCount: 2, guestNames: ["Jane Smith"] },
+    welcome_party: { attending: true, guestCount: 2 },
+    wedding_ceremony: { attending: true, guestCount: 2 },
+    foodAllergies: "Shellfish, gluten"
+  }
+}
+```
+
+Make it functional, user-friendly, and genuinely capture that ironic 90s internet aesthetic. The RSVP system is the most critical feature - it must handle multiple events and personalized guest invitations seamlessly.
