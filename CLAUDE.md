@@ -22,15 +22,14 @@ Wedding website deployed on Vercel with Neon PostgreSQL.
 ### Directory Structure
 
 - `client/` - React frontend (Vite)
-- `api/` - Vercel serverless functions
-- `shared/` - Database schema, tRPC router, utilities
+- `api/trpc/[trpc].ts` - tRPC API handler (all backend code inlined)
+- `drizzle/schema.ts` - Database schema for Drizzle Kit migrations
 - `tests/` - Unit tests (Vitest) and e2e tests (Playwright)
 - `attached_assets/` - Static images
 
 ### Path Aliases
 
 - `@/` → `client/src/`
-- `@shared/` → `shared/`
 - `@assets/` → `attached_assets/`
 
 ### Tech Stack
@@ -43,7 +42,7 @@ Wedding website deployed on Vercel with Neon PostgreSQL.
 
 **Backend:**
 
-- tRPC router in `shared/router.ts`
+- tRPC router in `api/lib/router.ts`
 - Vercel serverless function at `api/trpc/[trpc].ts`
 - Drizzle ORM with Neon PostgreSQL
 
@@ -56,9 +55,8 @@ Wedding website deployed on Vercel with Neon PostgreSQL.
 
 ### Key Files
 
-- `shared/router.ts` - tRPC router with auth and rsvp procedures
-- `shared/schema.ts` - Drizzle database schema and Zod validators
-- `shared/sanitize.ts` - Input sanitization utilities
+- `api/trpc/[trpc].ts` - All backend code (router, schema, db, validation, utilities)
+- `drizzle/schema.ts` - Database schema for migrations (kept in sync with handler)
 - `client/src/lib/trpc.ts` - tRPC client setup
 
 ### Testing
@@ -69,11 +67,37 @@ Wedding website deployed on Vercel with Neon PostgreSQL.
 
 ## Design Guidelines
 
-The site follows a **coastal luxury aesthetic**:
+The site follows a **coastal luxury aesthetic** with light/dark mode support.
 
-- Typography: Cormorant Garamond (serif headings) + Montserrat (sans-serif body)
-- Colors: Dusty Blue (#A8BCC9), Cream (#F5F1EA), Deep Navy (#2C3E50)
-- Generous whitespace, subtle animations, photography-first design
+### Typography
+
+- **Primary font:** Forum (serif) - used for both headings and body via `font-sans`/`font-serif`
+- **Script font:** Great Vibes - for decorative accents (`.script-font`)
+- **Utility classes:** `.elegant-serif`, `.letter-spacing-wide`
+
+### Color Palette (HSL values in CSS variables)
+
+| Token | Light Mode | Usage |
+|-------|------------|-------|
+| `--primary` | `205 20% 65%` (Dusty Blue) | Buttons, links, accents |
+| `--background` | `40 25% 98%` (Warm Cream) | Page background |
+| `--foreground` | `210 20% 20%` (Deep Navy) | Primary text |
+| `--card` | `40 30% 96%` | Card backgrounds |
+| `--muted` | `40 20% 92%` | Subtle backgrounds |
+| `--muted-foreground` | `210 15% 45%` | Secondary text |
+
+### Custom Utilities
+
+- `.coastal-shadow` - Soft blue-tinted shadow: `box-shadow: 0 4px 20px rgba(168, 188, 201, 0.15)`
+- `.fade-in-up` - Entrance animation (0.6s ease-out)
+- `.hover-elevate` / `.active-elevate-2` - Interactive brightness adjustment
+
+### Design Principles
+
+- Generous whitespace with `container mx-auto max-w-4xl px-6 py-20` pattern
+- Cards use `.coastal-shadow` and `border-0` for soft, floating appearance
+- Subtle animations on page transitions and interactions
+- Photography-first layout on hero sections
 
 ## Environment Variables
 
