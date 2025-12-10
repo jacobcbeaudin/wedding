@@ -1,33 +1,46 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-vi.mock('../../shared/db', () => ({
-  db: {
-    select: vi.fn(() => ({
-      from: vi.fn(() => ({
-        where: vi.fn(() => ({
-          limit: vi.fn(),
-        })),
-      })),
-    })),
-    update: vi.fn(() => ({
-      set: vi.fn(() => ({
-        where: vi.fn(() => ({
-          returning: vi.fn(),
-        })),
-      })),
-    })),
+// Mock the database at the module level
+const mockSelect = vi.fn();
+const mockUpdate = vi.fn();
+
+const mockDb = {
+  select: mockSelect,
+  update: mockUpdate,
+};
+
+// Mock drizzle-orm/neon-http to return our mock db
+vi.mock('drizzle-orm/neon-http', () => ({
+  drizzle: vi.fn(() => mockDb),
+}));
+
+// Mock @neondatabase/serverless
+vi.mock('@neondatabase/serverless', () => ({
+  neon: vi.fn(() => vi.fn()),
+}));
+
+// Mock @upstash/ratelimit to disable rate limiting in tests
+vi.mock('@upstash/ratelimit', () => ({
+  Ratelimit: vi.fn(),
+}));
+
+vi.mock('@upstash/redis', () => ({
+  Redis: {
+    fromEnv: vi.fn(),
   },
 }));
 
 describe('router', () => {
   beforeEach(() => {
     vi.resetModules();
+    vi.clearAllMocks();
     process.env.SITE_PASSWORD = 'testpassword';
+    process.env.DATABASE_URL = 'postgresql://test:test@localhost:5432/test';
   });
 
   describe('auth.verify', () => {
     it('accepts correct password', async () => {
-      const { router } = await import('../../shared/router');
+      const { router } = await import('../../api/trpc/[trpc]');
       const caller = router.createCaller({ ip: '127.0.0.1' });
 
       const result = await caller.auth.verify({ password: 'testpassword' });
@@ -35,7 +48,7 @@ describe('router', () => {
     });
 
     it('accepts password case-insensitively', async () => {
-      const { router } = await import('../../shared/router');
+      const { router } = await import('../../api/trpc/[trpc]');
       const caller = router.createCaller({ ip: '127.0.0.1' });
 
       const result = await caller.auth.verify({ password: 'TESTPASSWORD' });
@@ -43,7 +56,7 @@ describe('router', () => {
     });
 
     it('rejects incorrect password', async () => {
-      const { router } = await import('../../shared/router');
+      const { router } = await import('../../api/trpc/[trpc]');
       const caller = router.createCaller({ ip: '127.0.0.1' });
 
       await expect(caller.auth.verify({ password: 'wrong' })).rejects.toThrow('Incorrect password');
@@ -51,7 +64,7 @@ describe('router', () => {
 
     it('throws error when SITE_PASSWORD not configured', async () => {
       delete process.env.SITE_PASSWORD;
-      const { router } = await import('../../shared/router');
+      const { router } = await import('../../api/trpc/[trpc]');
       const caller = router.createCaller({ ip: '127.0.0.1' });
 
       await expect(caller.auth.verify({ password: 'test' })).rejects.toThrow(
@@ -82,16 +95,15 @@ describe('router', () => {
         rsvpSubmittedAt: null,
       };
 
-      const { db } = await import('../../shared/db');
-      vi.mocked(db.select).mockReturnValue({
+      mockSelect.mockReturnValue({
         from: vi.fn().mockReturnValue({
           where: vi.fn().mockReturnValue({
             limit: vi.fn().mockResolvedValue([mockGuest]),
           }),
         }),
-      } as never);
+      });
 
-      const { router } = await import('../../shared/router');
+      const { router } = await import('../../api/trpc/[trpc]');
       const caller = router.createCaller({ ip: '127.0.0.1' });
 
       const result = await caller.rsvp.lookup({ firstName: 'John', lastName: 'Smith' });
@@ -103,16 +115,15 @@ describe('router', () => {
     });
 
     it('throws NOT_FOUND when guest not found', async () => {
-      const { db } = await import('../../shared/db');
-      vi.mocked(db.select).mockReturnValue({
+      mockSelect.mockReturnValue({
         from: vi.fn().mockReturnValue({
           where: vi.fn().mockReturnValue({
             limit: vi.fn().mockResolvedValue([]),
           }),
         }),
-      } as never);
+      });
 
-      const { router } = await import('../../shared/router');
+      const { router } = await import('../../api/trpc/[trpc]');
       const caller = router.createCaller({ ip: '127.0.0.1' });
 
       await expect(caller.rsvp.lookup({ firstName: 'Nobody', lastName: 'Here' })).rejects.toThrow(
@@ -121,7 +132,7 @@ describe('router', () => {
     });
 
     it('rejects invalid names with only special characters', async () => {
-      const { router } = await import('../../shared/router');
+      const { router } = await import('../../api/trpc/[trpc]');
       const caller = router.createCaller({ ip: '127.0.0.1' });
 
       await expect(caller.rsvp.lookup({ firstName: '!!!', lastName: '@@@' })).rejects.toThrow(
@@ -137,6 +148,8 @@ describe('router', () => {
         id: guestId,
         firstName: 'john',
         lastName: 'smith',
+        email: null,
+        phone: null,
         invitedToTeaCeremony: false,
         invitedToWelcomeParty: true,
         invitedToWedding: true,
@@ -158,24 +171,23 @@ describe('router', () => {
         rsvpSubmittedAt: new Date(),
       };
 
-      const { db } = await import('../../shared/db');
-      vi.mocked(db.select).mockReturnValue({
+      mockSelect.mockReturnValue({
         from: vi.fn().mockReturnValue({
           where: vi.fn().mockReturnValue({
             limit: vi.fn().mockResolvedValue([mockGuest]),
           }),
         }),
-      } as never);
+      });
 
-      vi.mocked(db.update).mockReturnValue({
+      mockUpdate.mockReturnValue({
         set: vi.fn().mockReturnValue({
           where: vi.fn().mockReturnValue({
             returning: vi.fn().mockResolvedValue([updatedGuest]),
           }),
         }),
-      } as never);
+      });
 
-      const { router } = await import('../../shared/router');
+      const { router } = await import('../../api/trpc/[trpc]');
       const caller = router.createCaller({ ip: '127.0.0.1' });
 
       const result = await caller.rsvp.submit({
@@ -188,16 +200,15 @@ describe('router', () => {
     });
 
     it('throws NOT_FOUND for invalid guestId', async () => {
-      const { db } = await import('../../shared/db');
-      vi.mocked(db.select).mockReturnValue({
+      mockSelect.mockReturnValue({
         from: vi.fn().mockReturnValue({
           where: vi.fn().mockReturnValue({
             limit: vi.fn().mockResolvedValue([]),
           }),
         }),
-      } as never);
+      });
 
-      const { router } = await import('../../shared/router');
+      const { router } = await import('../../api/trpc/[trpc]');
       const caller = router.createCaller({ ip: '127.0.0.1' });
 
       await expect(

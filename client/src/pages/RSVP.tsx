@@ -8,7 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useToast } from '@/hooks/use-toast';
 import { trpc } from '@/lib/trpc';
-import type { GuestPublic } from '@shared/schema';
+import type { GuestPublic } from '../../../api/trpc/[trpc]';
 
 type RsvpStatus = 'attending' | 'declined';
 
@@ -34,34 +34,9 @@ export default function RSVP() {
     songRequests: '',
   });
 
-  const lookupQuery = trpc.rsvp.lookup.useQuery(
-    { firstName, lastName },
-    {
-      enabled: false,
-      retry: false,
-    }
-  );
-
-  const submitMutation = trpc.rsvp.submit.useMutation({
+  const lookupMutation = trpc.rsvp.lookup.useMutation({
     onSuccess: (data) => {
-      setGuest(data.guest as GuestPublic);
-      setStep('confirmation');
-      toast({
-        title: 'RSVP Submitted',
-        description: "Thank you! We can't wait to celebrate with you.",
-      });
-    },
-    onError: (err) => {
-      setSubmitError(err.message || 'Something went wrong. Please try again.');
-    },
-  });
-
-  const handleLookup = async () => {
-    setLookupError('');
-    const result = await lookupQuery.refetch();
-
-    if (result.data?.guest) {
-      const fetchedGuest = result.data.guest;
+      const fetchedGuest = data.guest;
       setGuest(fetchedGuest as GuestPublic);
       setFormData({
         teaCeremonyStatus:
@@ -80,12 +55,32 @@ export default function RSVP() {
         songRequests: fetchedGuest.songRequests || '',
       });
       setStep('form');
-    } else if (result.error) {
+    },
+    onError: (err) => {
       setLookupError(
-        result.error.message ||
+        err.message ||
           "We couldn't find your name. Please check the spelling matches your invitation."
       );
-    }
+    },
+  });
+
+  const submitMutation = trpc.rsvp.submit.useMutation({
+    onSuccess: (data) => {
+      setGuest(data.guest as GuestPublic);
+      setStep('confirmation');
+      toast({
+        title: 'RSVP Submitted',
+        description: "Thank you! We can't wait to celebrate with you.",
+      });
+    },
+    onError: (err) => {
+      setSubmitError(err.message || 'Something went wrong. Please try again.');
+    },
+  });
+
+  const handleLookup = () => {
+    setLookupError('');
+    lookupMutation.mutate({ firstName, lastName });
   };
 
   const handleSubmitRSVP = () => {
@@ -366,7 +361,7 @@ export default function RSVP() {
               placeholder="Enter your first name..."
               value={firstName}
               onChange={(e) => setFirstName(e.target.value)}
-              disabled={lookupQuery.isFetching}
+              disabled={lookupMutation.isPending}
               data-testid="input-first-name"
             />
           </div>
@@ -380,7 +375,7 @@ export default function RSVP() {
               placeholder="Enter your last name..."
               value={lastName}
               onChange={(e) => setLastName(e.target.value)}
-              disabled={lookupQuery.isFetching}
+              disabled={lookupMutation.isPending}
               data-testid="input-last-name"
             />
           </div>
@@ -389,12 +384,12 @@ export default function RSVP() {
 
           <Button
             onClick={handleLookup}
-            disabled={!firstName || !lastName || lookupQuery.isFetching}
+            disabled={!firstName || !lastName || lookupMutation.isPending}
             className="w-full"
             size="lg"
             data-testid="button-lookup-guest"
           >
-            {lookupQuery.isFetching ? 'Searching...' : 'Find My Invitation'}
+            {lookupMutation.isPending ? 'Searching...' : 'Find My Invitation'}
           </Button>
         </div>
 
