@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
 import { trpc } from '@/lib/trpc';
-import photo1 from '@assets/generated_images/couple_engagement_photo_1.png';
+import photo1 from '@assets/photo-01.webp';
 
 interface PasswordProtectionProps {
   children: React.ReactNode;

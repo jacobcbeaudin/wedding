@@ -1,7 +1,7 @@
 import SectionDivider from '@/components/SectionDivider';
 import { Card } from '@/components/ui/card';
-import photo2 from '@assets/generated_images/couple_sunset_beach_photo.png';
-import photo3 from '@assets/generated_images/couple_portrait_closeup.png';
+import photo2 from '@assets/photo-02.webp';
+import photo3 from '@assets/photo-03.webp';
 
 export default function OurStory() {
   return (
