@@ -3,7 +3,7 @@ import SectionDivider from '@/components/SectionDivider';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Link } from 'wouter';
-import photo1 from '@assets/generated_images/couple_engagement_photo_1.png';
+import photo1 from '@assets/photo-01.webp';
 
 export default function Home() {
   return (
