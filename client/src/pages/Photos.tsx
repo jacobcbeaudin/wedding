@@ -1,19 +1,18 @@
 import { useState } from 'react';
 import SectionDivider from '@/components/SectionDivider';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
-import photo1 from '@assets/generated_images/couple_engagement_photo_1.png';
-import photo2 from '@assets/generated_images/couple_sunset_beach_photo.png';
-import photo3 from '@assets/generated_images/couple_portrait_closeup.png';
-import photo4 from '@assets/generated_images/couple_picnic_date_photo.png';
-import photo5 from '@assets/generated_images/couple_hiking_adventure_photo.png';
+import photo1 from '@assets/photo-01.webp';
+import photo2 from '@assets/photo-02.webp';
+import photo3 from '@assets/photo-03.webp';
+import photo4 from '@assets/photo-04.webp';
+import photo5 from '@assets/photo-05.webp';
 
 const photos = [
-  { src: photo1, alt: 'Engagement photo' },
-  { src: photo2, alt: 'Sunset beach' },
-  { src: photo3, alt: 'Portrait closeup' },
-  { src: photo4, alt: 'Picnic date' },
-  { src: photo5, alt: 'Hiking adventure' },
-  { src: photo1, alt: 'Another moment' },
+  { src: photo1, alt: 'Photo 1' },
+  { src: photo2, alt: 'Photo 2' },
+  { src: photo3, alt: 'Photo 3' },
+  { src: photo4, alt: 'Photo 4' },
+  { src: photo5, alt: 'Photo 5' },
 ];
 
 export default function Photos() {
