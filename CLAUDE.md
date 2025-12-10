@@ -5,9 +5,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Commands
 
 ```bash
-npm run dev          # Start Vercel dev server
-npm run build        # Build for production (Vite)
+npm run dev          # Start Next.js dev server
+npm run build        # Build for production
+npm run start        # Start production server
 npm run check        # TypeScript type checking
+npm run lint         # Run ESLint
 npm run db:push      # Push Drizzle schema to database
 npm run db:studio    # Open Drizzle Studio
 npm test             # Run unit tests (watch mode)
@@ -17,53 +19,119 @@ npm run test:e2e     # Run Playwright e2e tests
 
 ## Architecture
 
-Wedding website deployed on Vercel with Neon PostgreSQL.
+Wedding website built with Next.js 15 App Router, deployed on Vercel with Neon PostgreSQL. Full-stack TypeScript with end-to-end type safety via tRPC.
 
 ### Directory Structure
 
-- `client/` - React frontend (Vite)
-- `api/trpc/[trpc].ts` - tRPC API handler (all backend code inlined)
-- `drizzle/schema.ts` - Database schema for Drizzle Kit migrations
-- `tests/` - Unit tests (Vitest) and e2e tests (Playwright)
-- `attached_assets/` - Static images
+```
+wedding/
+├── app/                    # Next.js App Router
+│   ├── api/trpc/[trpc]/   # tRPC API route handler
+│   ├── layout.tsx         # Root layout with providers
+│   ├── globals.css        # Global styles + Tailwind
+│   └── [page]/page.tsx    # Page components
+├── components/
+│   ├── ui/                # shadcn/ui components
+│   ├── providers/         # Context providers (tRPC)
+│   └── *.tsx              # Feature components
+├── lib/
+│   ├── db/                # Database (single source of truth)
+│   │   ├── schema.ts      # Drizzle schema
+│   │   └── index.ts       # DB connection
+│   ├── trpc/              # tRPC backend
+│   │   ├── router.ts      # Root router
+│   │   ├── routers/       # Procedure routers
+│   │   ├── context.ts     # Request context
+│   │   ├── init.ts        # tRPC initialization
+│   │   └── utils.ts       # Backend utilities
+│   ├── validations/       # Zod schemas (shared)
+│   └── utils.ts           # cn() for Tailwind
+├── hooks/                 # Custom React hooks
+├── public/                # Static assets
+│   └── images/            # Optimized images
+└── tests/
+    ├── unit/              # Vitest unit tests
+    └── e2e/               # Playwright e2e tests
+```
 
 ### Path Aliases
 
-- `@/` → `client/src/`
-- `@assets/` → `attached_assets/`
+- `@/*` -> `./*` (project root)
 
 ### Tech Stack
 
 **Frontend:**
-
-- React 18 with wouter for routing
-- TanStack Query + tRPC for data fetching
-- Tailwind CSS with shadcn/ui components
+- Next.js 15 App Router with React Server Components
+- React 18 with `'use client'` for interactive components
+- TanStack Query + tRPC React for type-safe data fetching
+- Tailwind CSS + shadcn/ui component library
 
 **Backend:**
-
-- tRPC router in `api/lib/router.ts`
-- Vercel serverless function at `api/trpc/[trpc].ts`
-- Drizzle ORM with Neon PostgreSQL
+- tRPC v11 with fetch adapter for Next.js
+- Drizzle ORM with Neon PostgreSQL (serverless)
+- Zod for runtime validation (shared with frontend)
 
 **Infrastructure:**
-
-- Vercel for hosting and serverless functions
-- Neon for PostgreSQL database
+- Vercel for hosting and edge functions
+- Neon for serverless PostgreSQL
 - Upstash Redis for rate limiting
-- Resend for transactional emails (planned)
 
-### Key Files
+### Database Schema (Relational)
 
-- `api/trpc/[trpc].ts` - All backend code (router, schema, db, validation, utilities)
-- `drizzle/schema.ts` - Database schema for migrations (kept in sync with handler)
-- `client/src/lib/trpc.ts` - tRPC client setup
+```
+parties (1) ←→ (N) guests
+parties (1) ←→ (N) invitations
+events  (1) ←→ (N) invitations
+guests  (1) ←→ (N) rsvps
+events  (1) ←→ (N) rsvps
+guests  (1) ←→ (N) song_requests
+```
 
-### Testing
+- **parties** - Households/groups that receive invitations together
+- **guests** - Individual people belonging to a party
+- **events** - Wedding events (tea ceremony, welcome party, wedding)
+- **invitations** - Which parties are invited to which events
+- **rsvps** - Individual guest responses per event
+- **song_requests** - Songs requested by guests (tracks who requested)
 
-- Unit tests use `router.createCaller()` to test tRPC procedures directly
-- Tests run against a test database (see `tests/setup.ts`)
-- Pre-commit hooks run ESLint and Prettier via Husky
+### Key Patterns
+
+**Type Safety Flow:**
+
+```text
+Zod Schema (lib/validations/)
+    → tRPC Procedure (lib/trpc/routers/)
+    → tRPC Client (components/providers/)
+    → React Component (app/)
+```
+
+**Server vs Client Components:**
+
+- Pages in `app/` use `'use client'` for interactivity
+- Layout and providers wrap client components
+- tRPC queries/mutations require client components
+
+## Design Philosophy
+
+### Principles
+
+1. **Type Safety First** - End-to-end TypeScript with tRPC eliminates runtime type errors between client and server.
+
+2. **Single Source of Truth** - Database schema lives in `lib/db/schema.ts`. Validation schemas in `lib/validations/`. No duplication.
+
+3. **Colocation** - Related code lives together. tRPC routers with their utilities, components with their hooks.
+
+4. **Progressive Enhancement** - Server-render what's possible, hydrate for interactivity. Mobile-first responsive design.
+
+5. **Minimal Dependencies** - Prefer platform APIs and well-maintained libraries. No unnecessary abstractions.
+
+### Code Style
+
+- Functional components with hooks
+- Named exports for components, type exports for types
+- Async/await over promises
+- Early returns over nested conditionals
+- Descriptive variable names over comments
 
 ## Design Guidelines
 
@@ -71,11 +139,11 @@ The site follows a **coastal luxury aesthetic** with light/dark mode support.
 
 ### Typography
 
-- **Primary font:** Forum (serif) - used for both headings and body via `font-sans`/`font-serif`
-- **Script font:** Great Vibes - for decorative accents (`.script-font`)
+- **Primary font:** Forum (serif) - headings and body via `font-sans`/`font-serif`
+- **Script font:** Great Vibes - decorative accents (`.script-font`)
 - **Utility classes:** `.elegant-serif`, `.letter-spacing-wide`
 
-### Color Palette (HSL values in CSS variables)
+### Color Palette (HSL CSS variables)
 
 | Token | Light Mode | Usage |
 |-------|------------|-------|
@@ -84,27 +152,65 @@ The site follows a **coastal luxury aesthetic** with light/dark mode support.
 | `--foreground` | `210 20% 20%` (Deep Navy) | Primary text |
 | `--card` | `40 30% 96%` | Card backgrounds |
 | `--muted` | `40 20% 92%` | Subtle backgrounds |
-| `--muted-foreground` | `210 15% 45%` | Secondary text |
 
 ### Custom Utilities
 
-- `.coastal-shadow` - Soft blue-tinted shadow: `box-shadow: 0 4px 20px rgba(168, 188, 201, 0.15)`
+- `.coastal-shadow` - Soft shadow: `box-shadow: 0 4px 20px rgba(168, 188, 201, 0.15)`
 - `.fade-in-up` - Entrance animation (0.6s ease-out)
-- `.hover-elevate` / `.active-elevate-2` - Interactive brightness adjustment
+- `.hover-elevate` - Interactive brightness adjustment
 
-### Design Principles
+### Layout Patterns
 
-- Generous whitespace with `container mx-auto max-w-4xl px-6 py-20` pattern
-- Cards use `.coastal-shadow` and `border-0` for soft, floating appearance
-- Subtle animations on page transitions and interactions
-- Photography-first layout on hero sections
+- `container mx-auto max-w-4xl px-6 py-20` - Standard page container
+- Cards: `.coastal-shadow` + `border-0` for floating appearance
+- Mobile: Hamburger menu with slide-out drawer (Sheet component)
 
 ## Environment Variables
 
 ```bash
-DATABASE_URL=           # Neon PostgreSQL connection string
-SITE_PASSWORD=          # Password for site access
-UPSTASH_REDIS_REST_URL= # Upstash Redis URL (optional, for rate limiting)
+DATABASE_URL=             # Neon PostgreSQL connection string
+SITE_PASSWORD=            # Password for site access
+UPSTASH_REDIS_REST_URL=   # Upstash Redis URL (rate limiting)
 UPSTASH_REDIS_REST_TOKEN= # Upstash Redis token
-RESEND_API_KEY=         # Resend API key (for confirmation emails)
+RESEND_API_KEY=           # Resend API key (RSVP confirmations)
 ```
+
+## TODO
+
+### Content (Placeholder)
+
+- [ ] **Our Story page** - Replace placeholder content with real story, timeline, and photos
+- [ ] **Registry page** - Add actual registry links (Zola, Amazon, etc.)
+- [ ] **FAQ page** - Replace placeholder FAQs with real questions
+- [ ] **Photo gallery** - Add real engagement/couple photos
+
+### Database Setup
+
+- [ ] **Seed events** - Create the 3 events in database (tea ceremony, welcome party, wedding)
+- [ ] **Import guest list** - Add parties and guests from invitation list
+- [ ] **Create invitations** - Link parties to the events they're invited to
+
+### Features (Unimplemented)
+
+- [ ] **RSVP confirmation emails** - Send email via Resend after RSVP submission
+  - Add `RESEND_API_KEY` to environment
+  - Create email template in `lib/email/`
+  - Call from `rsvp.submit` procedure
+- [ ] **Redis rate limiting** - Currently optional, make production-ready
+  - Ensure `UPSTASH_REDIS_*` env vars are set
+  - Add rate limiting to all public procedures
+- [ ] **Admin dashboard** - View RSVPs, manage guests, export data
+- [ ] **Meal selection** - Add meal choice options to RSVP form
+
+### Performance
+
+- [ ] **Image optimization** - Use Next.js `<Image>` component for all photos
+  - Convert to WebP/AVIF formats
+  - Add proper width/height for CLS
+  - Implement blur placeholders
+- [ ] **Bundle optimization** - Analyze and reduce First Load JS (~150kB)
+
+### Testing
+
+- [ ] **E2E tests** - Update Playwright tests for new party-based RSVP flow
+- [ ] **Add integration tests** - Test full RSVP flow with database
