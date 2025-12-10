@@ -1,17 +1,17 @@
-import SectionDivider from "@/components/SectionDivider";
+import SectionDivider from '@/components/SectionDivider';
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from "@/components/ui/accordion";
-import { Card } from "@/components/ui/card";
+} from '@/components/ui/accordion';
+import { Card } from '@/components/ui/card';
 
 export default function FAQ() {
   return (
-    <div className="py-20 container mx-auto px-6 max-w-4xl">
-      <div className="text-center mb-16">
-        <h1 className="elegant-serif text-5xl md:text-6xl font-light mb-6 text-foreground">
+    <div className="container mx-auto max-w-4xl px-6 py-20">
+      <div className="mb-16 text-center">
+        <h1 className="elegant-serif mb-6 text-5xl font-light text-foreground md:text-6xl">
           Frequently Asked Questions
         </h1>
         <p className="text-lg text-muted-foreground">Everything you need to know</p>
@@ -19,19 +19,25 @@ export default function FAQ() {
 
       <SectionDivider />
 
-      <Card className="p-8 coastal-shadow border-0">
+      <Card className="coastal-shadow border-0 p-8">
         <Accordion type="single" collapsible className="w-full">
           <AccordionItem value="item-1">
             <AccordionTrigger className="text-lg font-medium" data-testid="faq-dress-code">
               What should I wear?
             </AccordionTrigger>
             <AccordionContent className="text-base text-foreground">
-              <p className="mb-2"><strong>Tea Ceremony:</strong> Semi-formal / Cocktail attire</p>
-              <p className="mb-2"><strong>Welcome Party:</strong> Casual chic / Resort casual</p>
-              <p className="mb-2"><strong>Wedding:</strong> Formal / Black tie optional</p>
+              <p className="mb-2">
+                <strong>Tea Ceremony:</strong> Semi-formal / Cocktail attire
+              </p>
+              <p className="mb-2">
+                <strong>Welcome Party:</strong> Casual chic / Resort casual
+              </p>
+              <p className="mb-2">
+                <strong>Wedding:</strong> Formal / Black tie optional
+              </p>
               <p className="mt-4 text-muted-foreground">
-                For the wedding ceremony, think cocktail dresses, formal jumpsuits, or suits and ties. 
-                It's an outdoor ceremony, so comfortable dress shoes are recommended!
+                For the wedding ceremony, think cocktail dresses, formal jumpsuits, or suits and
+                ties. It's an outdoor ceremony, so comfortable dress shoes are recommended!
               </p>
             </AccordionContent>
           </AccordionItem>
@@ -41,8 +47,8 @@ export default function FAQ() {
               Is parking available?
             </AccordionTrigger>
             <AccordionContent className="text-base text-foreground">
-              Yes! The Hyatt Highlands Carmel Inn offers complimentary valet and self-parking 
-              for all wedding guests.
+              Yes! The Hyatt Highlands Carmel Inn offers complimentary valet and self-parking for
+              all wedding guests.
             </AccordionContent>
           </AccordionItem>
 
@@ -51,7 +57,7 @@ export default function FAQ() {
               Can I bring my children?
             </AccordionTrigger>
             <AccordionContent className="text-base text-foreground">
-              While we love your little ones, we've decided to make our wedding an adults-only 
+              While we love your little ones, we've decided to make our wedding an adults-only
               celebration (18 and over). We hope this gives you a chance to enjoy a night off!
             </AccordionContent>
           </AccordionItem>
@@ -61,7 +67,7 @@ export default function FAQ() {
               Can I bring a plus-one?
             </AccordionTrigger>
             <AccordionContent className="text-base text-foreground">
-              Due to venue capacity, we can only accommodate guests formally invited on your RSVP. 
+              Due to venue capacity, we can only accommodate guests formally invited on your RSVP.
               If you have a plus-one, they will be indicated on your invitation.
             </AccordionContent>
           </AccordionItem>
@@ -71,9 +77,15 @@ export default function FAQ() {
               What food will be served?
             </AccordionTrigger>
             <AccordionContent className="text-base text-foreground">
-              <p className="mb-2"><strong>Tea Ceremony:</strong> Traditional Chinese tea and light refreshments</p>
-              <p className="mb-2"><strong>Welcome Party:</strong> Heavy appetizers and open bar</p>
-              <p className="mb-2"><strong>Wedding:</strong> Multi-course plated dinner with vegetarian options</p>
+              <p className="mb-2">
+                <strong>Tea Ceremony:</strong> Traditional Chinese tea and light refreshments
+              </p>
+              <p className="mb-2">
+                <strong>Welcome Party:</strong> Heavy appetizers and open bar
+              </p>
+              <p className="mb-2">
+                <strong>Wedding:</strong> Multi-course plated dinner with vegetarian options
+              </p>
               <p className="mt-4 text-muted-foreground">
                 Please let us know about dietary restrictions when you RSVP!
               </p>
@@ -85,8 +97,8 @@ export default function FAQ() {
               When should I book my hotel?
             </AccordionTrigger>
             <AccordionContent className="text-base text-foreground">
-              We recommend booking as soon as possible! Our room block at the Hyatt Highlands 
-              must be booked by August 12, 2026 using code BEAUDINZHANG2026.
+              We recommend booking as soon as possible! Our room block at the Hyatt Highlands must
+              be booked by August 12, 2026 using code BEAUDINZHANG2026.
             </AccordionContent>
           </AccordionItem>
 
@@ -95,7 +107,7 @@ export default function FAQ() {
               What will the weather be like?
             </AccordionTrigger>
             <AccordionContent className="text-base text-foreground">
-              September in Carmel is beautiful! Expect temperatures in the mid-60s to low-70s°F 
+              September in Carmel is beautiful! Expect temperatures in the mid-60s to low-70s°F
               during the day. It can get cooler in the evening, so bring a light jacket or wrap.
             </AccordionContent>
           </AccordionItem>
@@ -114,8 +126,9 @@ export default function FAQ() {
               Will there be a photographer?
             </AccordionTrigger>
             <AccordionContent className="text-base text-foreground">
-              Yes! We'll have a professional photographer and videographer. We kindly ask that you 
-              keep phones away during the ceremony. We'll share all professional photos after the wedding.
+              Yes! We'll have a professional photographer and videographer. We kindly ask that you
+              keep phones away during the ceremony. We'll share all professional photos after the
+              wedding.
             </AccordionContent>
           </AccordionItem>
 
@@ -124,17 +137,18 @@ export default function FAQ() {
               Do you have a registry?
             </AccordionTrigger>
             <AccordionContent className="text-base text-foreground">
-              Your presence is the greatest gift! However, if you'd like to contribute to our 
-              honeymoon fund, you can find our Venmo and PayPal information on the Gift Registry page.
+              Your presence is the greatest gift! However, if you'd like to contribute to our
+              honeymoon fund, you can find our Venmo and PayPal information on the Gift Registry
+              page.
             </AccordionContent>
           </AccordionItem>
         </Accordion>
       </Card>
 
-      <div className="text-center mt-12">
-        <p className="elegant-serif text-xl text-foreground mb-2">Still have questions?</p>
+      <div className="mt-12 text-center">
+        <p className="elegant-serif mb-2 text-xl text-foreground">Still have questions?</p>
         <p className="text-muted-foreground">
-          Email us at{" "}
+          Email us at{' '}
           <a href="mailto:wedding@carolineandjake.com" className="text-primary underline">
             wedding@carolineandjake.com
           </a>

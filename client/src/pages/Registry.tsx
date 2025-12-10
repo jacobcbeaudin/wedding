@@ -1,12 +1,12 @@
-import SectionDivider from "@/components/SectionDivider";
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import SectionDivider from '@/components/SectionDivider';
+import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 
 export default function Registry() {
   return (
-    <div className="py-20 container mx-auto px-6 max-w-4xl">
-      <div className="text-center mb-16">
-        <h1 className="elegant-serif text-5xl md:text-6xl font-light mb-6 text-foreground">
+    <div className="container mx-auto max-w-4xl px-6 py-20">
+      <div className="mb-16 text-center">
+        <h1 className="elegant-serif mb-6 text-5xl font-light text-foreground md:text-6xl">
           Gift Registry
         </h1>
         <p className="text-lg text-muted-foreground">Your love is the greatest gift</p>
@@ -14,29 +14,40 @@ export default function Registry() {
 
       <SectionDivider />
 
-      <Card className="p-12 text-center max-w-2xl mx-auto mb-12 coastal-shadow border-0">
-        <h2 className="elegant-serif text-3xl mb-6 text-primary">
-          Your Presence is Our Present
-        </h2>
-        <p className="text-lg mb-6 text-foreground leading-relaxed">
-          We are so grateful that you're able to join us for our special day. 
-          Your love, laughter, and presence at our wedding is the greatest gift we could ask for.
+      <Card className="coastal-shadow mx-auto mb-12 max-w-2xl border-0 p-12 text-center">
+        <h2 className="elegant-serif mb-6 text-3xl text-primary">Your Presence is Our Present</h2>
+        <p className="mb-6 text-lg leading-relaxed text-foreground">
+          We are so grateful that you're able to join us for our special day. Your love, laughter,
+          and presence at our wedding is the greatest gift we could ask for.
         </p>
-        <p className="text-foreground leading-relaxed">
-          However, if you would like to contribute to our honeymoon adventure 
-          or help us start our new life together, we would be incredibly touched.
+        <p className="leading-relaxed text-foreground">
+          However, if you would like to contribute to our honeymoon adventure or help us start our
+          new life together, we would be incredibly touched.
         </p>
       </Card>
 
-      <div className="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto mb-12">
-        <Card className="p-8 text-center coastal-shadow border-0">
-          <h3 className="elegant-serif text-2xl mb-4 text-primary">Venmo</h3>
-          <p className="text-lg mb-6 font-medium text-foreground">@JakeAndCaroline2026</p>
-          <Button 
+      <div className="mx-auto mb-12 grid max-w-4xl gap-6 md:grid-cols-3">
+        <Card className="coastal-shadow border-0 p-8 text-center">
+          <h3 className="elegant-serif mb-4 text-2xl text-primary">Honeyfund</h3>
+          <p className="mb-6 text-muted-foreground">Contribute to our honeymoon experiences</p>
+          <Button
             className="w-full"
             onClick={() => {
-              console.log("Venmo clicked");
-              window.open("https://venmo.com", "_blank");
+              window.open('https://www.honeyfund.com/', '_blank');
+            }}
+            data-testid="button-honeyfund"
+          >
+            View Our Registry
+          </Button>
+        </Card>
+
+        <Card className="coastal-shadow border-0 p-8 text-center">
+          <h3 className="elegant-serif mb-4 text-2xl text-primary">Venmo</h3>
+          <p className="mb-6 text-muted-foreground">@YourVenmoHandle</p>
+          <Button
+            className="w-full"
+            onClick={() => {
+              window.open('https://venmo.com/', '_blank');
             }}
             data-testid="button-venmo"
           >
@@ -44,14 +55,13 @@ export default function Registry() {
           </Button>
         </Card>
 
-        <Card className="p-8 text-center coastal-shadow border-0">
-          <h3 className="elegant-serif text-2xl mb-4 text-primary">PayPal</h3>
-          <p className="text-lg mb-6 font-medium text-foreground">jakecaroline@wedding.com</p>
-          <Button 
+        <Card className="coastal-shadow border-0 p-8 text-center">
+          <h3 className="elegant-serif mb-4 text-2xl text-primary">PayPal</h3>
+          <p className="mb-6 text-muted-foreground">your@email.com</p>
+          <Button
             className="w-full"
             onClick={() => {
-              console.log("PayPal clicked");
-              window.open("https://paypal.com", "_blank");
+              window.open('https://paypal.com/', '_blank');
             }}
             data-testid="button-paypal"
           >
@@ -60,18 +70,20 @@ export default function Registry() {
         </Card>
       </div>
 
-      <Card className="p-8 max-w-2xl mx-auto bg-secondary/20 border-0">
-        <h3 className="elegant-serif text-2xl mb-4 text-center text-primary">Our Honeymoon Plans</h3>
-        <p className="text-foreground leading-relaxed text-center">
-          We're planning an amazing two-week adventure through Japan! 
-          From exploring Tokyo's vibrant neighborhoods to hiking Mount Fuji, 
-          relaxing in traditional onsens in Hakone, and wandering through the 
-          historic temples of Kyoto. Your contributions will help make this 
-          dream trip a reality and give us memories to last a lifetime!
+      <Card className="mx-auto max-w-2xl border-0 bg-secondary/20 p-8">
+        <h3 className="elegant-serif mb-4 text-center text-2xl text-primary">
+          Our Honeymoon Plans
+        </h3>
+        <p className="text-center leading-relaxed text-foreground">
+          We're planning an incredible three-week adventure through Australia! From diving the Great
+          Barrier Reef and spotting wildlife on Kangaroo Island, to exploring Melbourne's laneways,
+          hiking Tasmania's wilderness, experiencing Sydney's iconic harbor, and relaxing on the
+          pristine beaches of the Whitsundays. Your contributions will help make this dream trip a
+          reality and give us memories to last a lifetime!
         </p>
       </Card>
 
-      <div className="text-center mt-12">
+      <div className="mt-12 text-center">
         <p className="elegant-serif text-xl text-foreground">
           Thank you for your love and generosity
         </p>
