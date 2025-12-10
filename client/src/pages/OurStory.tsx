@@ -1,13 +1,13 @@
-import SectionDivider from "@/components/SectionDivider";
-import { Card } from "@/components/ui/card";
-import photo2 from "@assets/generated_images/couple_sunset_beach_photo.png";
-import photo3 from "@assets/generated_images/couple_portrait_closeup.png";
+import SectionDivider from '@/components/SectionDivider';
+import { Card } from '@/components/ui/card';
+import photo2 from '@assets/generated_images/couple_sunset_beach_photo.png';
+import photo3 from '@assets/generated_images/couple_portrait_closeup.png';
 
 export default function OurStory() {
   return (
-    <div className="py-20 container mx-auto px-6 max-w-5xl">
-      <div className="text-center mb-16">
-        <h1 className="elegant-serif text-5xl md:text-6xl font-light mb-6 text-foreground">
+    <div className="container mx-auto max-w-5xl px-6 py-20">
+      <div className="mb-16 text-center">
+        <h1 className="elegant-serif mb-6 text-5xl font-light text-foreground md:text-6xl">
           Our Story
         </h1>
         <p className="text-lg text-muted-foreground">How two hearts became one</p>
@@ -15,59 +15,50 @@ export default function OurStory() {
 
       <SectionDivider />
 
-      <div className="grid md:grid-cols-2 gap-12 items-center mb-20">
+      <div className="mb-20 grid items-center gap-12 md:grid-cols-2">
         <div>
-          <img 
-            src={photo2} 
-            alt="Jake and Caroline" 
-            className="rounded-lg coastal-shadow w-full"
-          />
+          <img src={photo2} alt="Jake and Caroline" className="coastal-shadow w-full rounded-lg" />
         </div>
         <div>
-          <h2 className="elegant-serif text-3xl md:text-4xl mb-6 text-primary">
-            How We Met
-          </h2>
-          <p className="text-lg text-foreground leading-relaxed mb-4">
-            Our love story began in a charming coffee shop in downtown San Francisco during the fall of 2020. 
-            Caroline was struggling with her laptop, and Jake, being the tech-savvy gentleman he is, offered to help.
+          <h2 className="elegant-serif mb-6 text-3xl text-primary md:text-4xl">How We Met</h2>
+          <p className="mb-4 text-lg leading-relaxed text-foreground">
+            Our love story began in a charming coffee shop in downtown San Francisco during the fall
+            of 2020. Caroline was struggling with her laptop, and Jake, being the tech-savvy
+            gentleman he is, offered to help.
           </p>
-          <p className="text-lg text-foreground leading-relaxed">
-            What started as a simple act of kindness turned into a three-hour conversation about everything from 
-            their favorite movies to their dreams for the future. They discovered they both loved hiking, had an 
-            inexplicable fondness for terrible puns, and shared a passion for trying new restaurants.
+          <p className="text-lg leading-relaxed text-foreground">
+            What started as a simple act of kindness turned into a three-hour conversation about
+            everything from their favorite movies to their dreams for the future. They discovered
+            they both loved hiking, had an inexplicable fondness for terrible puns, and shared a
+            passion for trying new restaurants.
           </p>
         </div>
       </div>
 
-      <div className="grid md:grid-cols-2 gap-12 items-center mb-20">
+      <div className="mb-20 grid items-center gap-12 md:grid-cols-2">
         <div className="order-2 md:order-1">
-          <h2 className="elegant-serif text-3xl md:text-4xl mb-6 text-primary">
-            The Proposal
-          </h2>
-          <p className="text-lg text-foreground leading-relaxed mb-4">
-            On a beautiful spring evening in 2025, Jake planned a surprise trip to Big Sur. He told Caroline they 
-            were just going for a weekend hike, but he had something much more special in mind.
+          <h2 className="elegant-serif mb-6 text-3xl text-primary md:text-4xl">The Proposal</h2>
+          <p className="mb-4 text-lg leading-relaxed text-foreground">
+            On a beautiful spring evening in 2025, Jake planned a surprise trip to Big Sur. He told
+            Caroline they were just going for a weekend hike, but he had something much more special
+            in mind.
           </p>
-          <p className="text-lg text-foreground leading-relaxed">
-            As they reached the top of their favorite trail at sunset, overlooking the Pacific Ocean, Jake got down 
-            on one knee. "Caroline, you make every day an adventure. Will you make me the happiest person alive 
-            and marry me?" Through happy tears, Caroline said YES!
+          <p className="text-lg leading-relaxed text-foreground">
+            As they reached the top of their favorite trail at sunset, overlooking the Pacific
+            Ocean, Jake got down on one knee. "Caroline, you make every day an adventure. Will you
+            make me the happiest person alive and marry me?" Through happy tears, Caroline said YES!
           </p>
         </div>
         <div className="order-1 md:order-2">
-          <img 
-            src={photo3} 
-            alt="The proposal" 
-            className="rounded-lg coastal-shadow w-full"
-          />
+          <img src={photo3} alt="The proposal" className="coastal-shadow w-full rounded-lg" />
         </div>
       </div>
 
       <SectionDivider />
 
-      <div className="grid md:grid-cols-2 gap-8 mb-12">
-        <Card className="p-8 coastal-shadow border-0">
-          <h3 className="elegant-serif text-2xl mb-6 text-primary">About Jake</h3>
+      <div className="mb-12 grid gap-8 md:grid-cols-2">
+        <Card className="coastal-shadow border-0 p-8">
+          <h3 className="elegant-serif mb-6 text-2xl text-primary">About Jake</h3>
           <ul className="space-y-3 text-foreground">
             <li className="flex gap-3">
               <span className="text-primary">•</span>
@@ -92,8 +83,8 @@ export default function OurStory() {
           </ul>
         </Card>
 
-        <Card className="p-8 coastal-shadow border-0">
-          <h3 className="elegant-serif text-2xl mb-6 text-primary">About Caroline</h3>
+        <Card className="coastal-shadow border-0 p-8">
+          <h3 className="elegant-serif mb-6 text-2xl text-primary">About Caroline</h3>
           <ul className="space-y-3 text-foreground">
             <li className="flex gap-3">
               <span className="text-primary">•</span>
@@ -119,9 +110,9 @@ export default function OurStory() {
         </Card>
       </div>
 
-      <Card className="p-8 bg-secondary/30 border-0">
-        <h3 className="elegant-serif text-2xl mb-6 text-center text-primary">Fun Facts About Us</h3>
-        <div className="grid md:grid-cols-2 gap-4 text-foreground">
+      <Card className="border-0 bg-secondary/30 p-8">
+        <h3 className="elegant-serif mb-6 text-center text-2xl text-primary">Fun Facts About Us</h3>
+        <div className="grid gap-4 text-foreground md:grid-cols-2">
           <div className="flex gap-3">
             <span className="text-primary">•</span>
             <span>We bonded over Mario Kart (Caroline always wins)</span>
@@ -145,7 +136,7 @@ export default function OurStory() {
         </div>
       </Card>
 
-      <div className="text-center mt-16">
+      <div className="mt-16 text-center">
         <p className="elegant-serif text-2xl text-foreground">
           We can't wait to celebrate with you
         </p>

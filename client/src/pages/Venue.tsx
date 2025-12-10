@@ -1,12 +1,12 @@
-import SectionDivider from "@/components/SectionDivider";
-import { Card } from "@/components/ui/card";
-import { MapPin, Hotel, Plane, Car } from "lucide-react";
+import SectionDivider from '@/components/SectionDivider';
+import { Card } from '@/components/ui/card';
+import { MapPin, Hotel, Plane, Car } from 'lucide-react';
 
 export default function Venue() {
   return (
-    <div className="py-20 container mx-auto px-6 max-w-5xl">
-      <div className="text-center mb-16">
-        <h1 className="elegant-serif text-5xl md:text-6xl font-light mb-6 text-foreground">
+    <div className="container mx-auto max-w-5xl px-6 py-20">
+      <div className="mb-16 text-center">
+        <h1 className="elegant-serif mb-6 text-5xl font-light text-foreground md:text-6xl">
           Travel & Accommodations
         </h1>
         <p className="text-lg text-muted-foreground">Everything you need to know</p>
@@ -14,23 +14,21 @@ export default function Venue() {
 
       <SectionDivider />
 
-      <Card className="p-8 mb-12 coastal-shadow border-0">
-        <div className="flex items-start gap-4 mb-6">
-          <MapPin className="w-6 h-6 text-primary flex-shrink-0 mt-1" />
+      <Card className="coastal-shadow mb-12 border-0 p-8">
+        <div className="mb-6 flex items-start gap-4">
+          <MapPin className="mt-1 h-6 w-6 flex-shrink-0 text-primary" />
           <div className="flex-1">
-            <h2 className="elegant-serif text-3xl mb-4 text-primary">Venue</h2>
-            <p className="text-xl font-medium mb-2 text-foreground">Hyatt Carmel Highlands</p>
-            <p className="text-muted-foreground mb-6">
-              120 Highlands Dr, Carmel, CA 93923
-            </p>
-            <p className="text-foreground leading-relaxed mb-6">
-              Nestled in the beautiful hills of Carmel, the Hyatt Highlands offers stunning views 
-              of the Pacific Ocean and is the perfect backdrop for our special weekend.
+            <h2 className="elegant-serif mb-4 text-3xl text-primary">Venue</h2>
+            <p className="mb-2 text-xl font-medium text-foreground">Hyatt Carmel Highlands</p>
+            <p className="mb-6 text-muted-foreground">120 Highlands Dr, Carmel, CA 93923</p>
+            <p className="mb-6 leading-relaxed text-foreground">
+              Nestled in the beautiful hills of Carmel, the Hyatt Highlands offers stunning views of
+              the Pacific Ocean and is the perfect backdrop for our special weekend.
             </p>
           </div>
         </div>
 
-        <div className="rounded-lg overflow-hidden border border-border">
+        <div className="overflow-hidden rounded-lg border border-border">
           <iframe
             src="https://www.google.com/maps?q=Hyatt+Carmel+Highlands,+120+Highlands+Dr,+Carmel,+CA+93923&output=embed"
             width="100%"
@@ -44,51 +42,66 @@ export default function Venue() {
         </div>
       </Card>
 
-      <Card className="p-8 mb-12 coastal-shadow border-0">
+      <Card className="coastal-shadow mb-12 border-0 p-8">
         <div className="flex items-start gap-4">
-          <Hotel className="w-6 h-6 text-primary flex-shrink-0 mt-1" />
+          <Hotel className="mt-1 h-6 w-6 flex-shrink-0 text-primary" />
           <div className="flex-1">
-            <h2 className="elegant-serif text-3xl mb-6 text-primary">Where to Stay</h2>
-            
-            <div className="mb-8 p-6 bg-secondary/20 rounded-lg">
-              <h3 className="text-xl font-medium mb-4 text-foreground">Hyatt Carmel Highlands</h3>
+            <h2 className="elegant-serif mb-6 text-3xl text-primary">Where to Stay</h2>
+
+            <div className="mb-8 rounded-lg bg-secondary/20 p-6">
+              <h3 className="mb-4 text-xl font-medium text-foreground">Hyatt Carmel Highlands</h3>
               <div className="space-y-2 text-foreground">
-                <p><span className="font-medium">Room Block Rate:</span> $199/night</p>
-                <p><span className="font-medium">Booking Code:</span> BEAUDINZHANG2026</p>
-                <p><span className="font-medium">Reservations:</span> (831) 555-0123</p>
-                <p><span className="font-medium">Deadline:</span> August 12, 2026</p>
+                <p>
+                  <span className="font-medium">Room Block Rate:</span> $199/night
+                </p>
+                <p>
+                  <span className="font-medium">Booking Code:</span> BEAUDINZHANG2026
+                </p>
+                <p>
+                  <span className="font-medium">Reservations:</span> (831) 555-0123
+                </p>
+                <p>
+                  <span className="font-medium">Deadline:</span> August 12, 2026
+                </p>
               </div>
               <p className="mt-4 text-muted-foreground">
-                We have a special room block at our venue hotel! This is the most convenient option 
-                as you'll be steps away from all events. The block includes complimentary breakfast and parking.
+                We have a special room block at our venue hotel! This is the most convenient option
+                as you'll be steps away from all events. The block includes complimentary breakfast
+                and parking.
               </p>
             </div>
 
-            <h4 className="font-medium mb-4 text-foreground">Alternative Accommodations</h4>
+            <h4 className="mb-4 font-medium text-foreground">Alternative Accommodations</h4>
             <ul className="space-y-2 text-foreground">
               <li className="flex gap-2">
                 <span className="text-primary">•</span>
-                <span><strong>La Playa Carmel</strong> - Boutique beachfront hotel, 2 miles away</span>
+                <span>
+                  <strong>La Playa Carmel</strong> - Boutique beachfront hotel, 2 miles away
+                </span>
               </li>
               <li className="flex gap-2">
                 <span className="text-primary">•</span>
-                <span><strong>Carmel Mission Inn</strong> - Budget-friendly option, 3 miles away</span>
+                <span>
+                  <strong>Carmel Mission Inn</strong> - Budget-friendly option, 3 miles away
+                </span>
               </li>
               <li className="flex gap-2">
                 <span className="text-primary">•</span>
-                <span><strong>Airbnb/VRBO</strong> - Many charming options in downtown Carmel</span>
+                <span>
+                  <strong>Airbnb/VRBO</strong> - Many charming options in downtown Carmel
+                </span>
               </li>
             </ul>
           </div>
         </div>
       </Card>
 
-      <div className="grid md:grid-cols-2 gap-8">
-        <Card className="p-8 coastal-shadow border-card-border">
+      <div className="grid gap-8 md:grid-cols-2">
+        <Card className="coastal-shadow border-card-border p-8">
           <div className="flex items-start gap-4">
-            <Plane className="w-6 h-6 text-primary flex-shrink-0 mt-1" />
+            <Plane className="mt-1 h-6 w-6 flex-shrink-0 text-primary" />
             <div>
-              <h3 className="elegant-serif text-2xl mb-4 text-primary">By Air</h3>
+              <h3 className="elegant-serif mb-4 text-2xl text-primary">By Air</h3>
               <div className="space-y-4 text-foreground">
                 <div>
                   <p className="font-medium">Monterey Regional (MRY)</p>
@@ -107,11 +120,11 @@ export default function Venue() {
           </div>
         </Card>
 
-        <Card className="p-8 coastal-shadow border-card-border">
+        <Card className="coastal-shadow border-card-border p-8">
           <div className="flex items-start gap-4">
-            <Car className="w-6 h-6 text-primary flex-shrink-0 mt-1" />
+            <Car className="mt-1 h-6 w-6 flex-shrink-0 text-primary" />
             <div>
-              <h3 className="elegant-serif text-2xl mb-4 text-primary">By Car</h3>
+              <h3 className="elegant-serif mb-4 text-2xl text-primary">By Car</h3>
               <div className="space-y-3 text-foreground">
                 <div>
                   <p className="font-medium">From San Francisco</p>
