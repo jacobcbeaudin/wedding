@@ -1,77 +1,65 @@
-import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Card } from "@/components/ui/card";
-import photo1 from "@assets/generated_images/couple_engagement_photo_1.png";
-
-const SITE_PASSWORD = "carolineandjake2026";
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Card } from '@/components/ui/card';
+import { trpc } from '@/lib/trpc';
+import photo1 from '@assets/generated_images/couple_engagement_photo_1.png';
 
 interface PasswordProtectionProps {
   children: React.ReactNode;
 }
 
 export default function PasswordProtection({ children }: PasswordProtectionProps) {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [isLoading, setIsLoading] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(() => {
+    return sessionStorage.getItem('wedding_authenticated') === 'true';
+  });
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
 
-  useEffect(() => {
-    const authenticated = sessionStorage.getItem("wedding_authenticated");
-    if (authenticated === "true") {
+  const verifyMutation = trpc.auth.verify.useMutation({
+    onSuccess: () => {
+      sessionStorage.setItem('wedding_authenticated', 'true');
       setIsAuthenticated(true);
-    }
-    setIsLoading(false);
-  }, []);
+    },
+    onError: (err) => {
+      if (err.data?.code === 'TOO_MANY_REQUESTS') {
+        setError('Too many attempts. Please wait a moment and try again.');
+      } else {
+        setError('Incorrect password. Please check your invitation.');
+      }
+      setPassword('');
+    },
+  });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (password.toLowerCase() === SITE_PASSWORD.toLowerCase()) {
-      sessionStorage.setItem("wedding_authenticated", "true");
-      setIsAuthenticated(true);
-      setError("");
-    } else {
-      setError("Incorrect password. Please check your invitation.");
-      setPassword("");
-    }
+    setError('');
+    verifyMutation.mutate({ password });
   };
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="elegant-serif text-2xl text-muted-foreground">Loading...</div>
-      </div>
-    );
-  }
 
   if (isAuthenticated) {
     return <>{children}</>;
   }
 
   return (
-    <div 
-      className="min-h-screen flex items-center justify-center p-6"
+    <div
+      className="flex min-h-screen items-center justify-center p-6"
       style={{
         backgroundImage: `linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url(${photo1})`,
-        backgroundSize: "cover",
-        backgroundPosition: "center",
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
       }}
     >
-      <Card className="w-full max-w-md p-10 text-center coastal-shadow border-0 bg-background/95 backdrop-blur-sm">
+      <Card className="coastal-shadow w-full max-w-md border-0 bg-background/95 p-10 text-center backdrop-blur-sm">
         <div className="mb-8">
-          <h1 className="elegant-serif text-5xl text-primary mb-4 tracking-wide">
+          <h1 className="elegant-serif mb-4 text-5xl tracking-wide text-primary">
             Caroline & Jake
           </h1>
-          <p className="elegant-serif text-xl text-muted-foreground">
-            September 12, 2026
-          </p>
+          <p className="elegant-serif text-xl text-muted-foreground">September 12, 2026</p>
         </div>
 
         <div className="mb-8">
-          <p className="text-foreground mb-2">
-            Welcome to our wedding website!
-          </p>
+          <p className="mb-2 text-foreground">Welcome to our wedding website!</p>
           <p className="text-sm text-muted-foreground">
             Please enter the password from your invitation to continue.
           </p>
@@ -85,26 +73,28 @@ export default function PasswordProtection({ children }: PasswordProtectionProps
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="text-center text-lg"
+              disabled={verifyMutation.isPending}
               data-testid="input-password"
             />
             {error && (
-              <p className="text-destructive text-sm mt-2" data-testid="text-password-error">
+              <p className="mt-2 text-sm text-destructive" data-testid="text-password-error">
                 {error}
               </p>
             )}
           </div>
-          
-          <Button 
-            type="submit" 
+
+          <Button
+            type="submit"
             className="w-full"
             size="lg"
+            disabled={verifyMutation.isPending}
             data-testid="button-submit-password"
           >
-            Enter Site
+            {verifyMutation.isPending ? 'Checking...' : 'Enter Site'}
           </Button>
         </form>
 
-        <p className="text-xs text-muted-foreground mt-8">
+        <p className="mt-8 text-xs text-muted-foreground">
           Having trouble? Contact Jake or Caroline directly.
         </p>
       </Card>
