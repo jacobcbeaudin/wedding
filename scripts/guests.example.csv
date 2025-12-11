@@ -1,0 +1,12 @@
+partyName,email,category,firstName,lastName,isPrimary,isChild
+Mom & Dad Beaudin,mom@email.com,allEvents,Mom,Beaudin,true,false
+Mom & Dad Beaudin,mom@email.com,allEvents,Dad,Beaudin,false,false
+The Uncle Bob Family,bob@email.com,allEvents,Bob,Beaudin,true,false
+The Uncle Bob Family,bob@email.com,allEvents,Aunt,Beaudin,false,false
+The Uncle Bob Family,bob@email.com,allEvents,Cousin,Beaudin,false,true
+Mike & Sarah Jones,mike@email.com,welcomeAndWedding,Mike,Jones,true,false
+Mike & Sarah Jones,mike@email.com,welcomeAndWedding,Sarah,Jones,false,false
+Alex Chen,alex@email.com,welcomeAndWedding,Alex,Chen,true,false
+The Johnson Family,tom@email.com,welcomeAndWedding,Tom,Johnson,true,false
+The Johnson Family,tom@email.com,welcomeAndWedding,Lisa,Johnson,false,false
+The Johnson Family,tom@email.com,welcomeAndWedding,Emma,Johnson,false,true

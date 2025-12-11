@@ -1,6 +1,3 @@
 {
-  "buildCommand": "npm run build",
-  "outputDirectory": "dist/public",
-  "framework": "vite",
-  "rewrites": [{ "source": "/((?!api/).*)", "destination": "/" }]
+  "framework": "nextjs"
 }
