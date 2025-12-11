@@ -7,8 +7,9 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Textarea } from '@/components/ui/textarea';
+import { Check, X, Utensils } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
 import { trpc } from '@/components/providers/trpc-provider';
 import { MEAL_OPTIONS, MEAL_REQUIRED_EVENT } from '@/lib/config/meals';
@@ -267,20 +268,20 @@ export default function RSVP() {
       <CoastalLayout>
         <div className="container mx-auto max-w-4xl px-6 py-12 sm:py-20">
           <div className="mb-12 text-center">
-            <h1 className="elegant-serif mb-6 text-4xl font-light text-foreground sm:text-5xl md:text-6xl">
+            <h1 className="elegant-serif text-foreground mb-6 text-4xl font-light sm:text-5xl md:text-6xl">
               Thank You!
             </h1>
           </div>
 
           <Card className="coastal-shadow mx-auto max-w-2xl border-0 p-8 text-center sm:p-12">
             <div className="mb-6 text-5xl sm:text-6xl">&#10003;</div>
-            <h2 className="elegant-serif mb-6 text-2xl text-primary sm:text-3xl">
+            <h2 className="elegant-serif text-primary mb-6 text-2xl sm:text-3xl">
               Your RSVP is Confirmed
             </h2>
-            <p className="mb-4 text-base text-foreground sm:text-lg">
+            <p className="text-foreground mb-4 text-base sm:text-lg">
               We can&apos;t wait to celebrate with you on our special day.
             </p>
-            <p className="mb-6 text-sm text-muted-foreground">Party: {party.name}</p>
+            <p className="text-muted-foreground mb-6 text-sm">Party: {party.name}</p>
             <Button
               variant="outline"
               onClick={() => {
@@ -303,7 +304,7 @@ export default function RSVP() {
       <CoastalLayout>
         <div className="container mx-auto max-w-4xl px-6 py-12 sm:py-20">
           <div className="mb-12 text-center">
-            <h1 className="elegant-serif mb-6 text-4xl font-light text-foreground sm:text-5xl md:text-6xl">
+            <h1 className="elegant-serif text-foreground mb-6 text-4xl font-light sm:text-5xl md:text-6xl">
               RSVP
             </h1>
           </div>
@@ -312,21 +313,21 @@ export default function RSVP() {
 
           {/* Party Welcome */}
           <Card className="coastal-shadow mb-6 border-0 p-6 sm:mb-8 sm:p-8">
-            <h2 className="elegant-serif mb-4 text-xl text-primary sm:text-2xl">
+            <h2 className="elegant-serif text-primary mb-4 text-xl sm:text-2xl">
               Welcome, {party.name}
             </h2>
-            <p className="text-sm text-muted-foreground sm:text-base">
+            <p className="text-muted-foreground text-sm sm:text-base">
               Please respond for each guest in your party.
             </p>
             <div className="mt-4 flex flex-wrap gap-2">
               {party.guests.map((guest) => (
                 <span
                   key={guest.id}
-                  className="rounded-full bg-muted px-3 py-1 text-sm text-foreground"
+                  className="bg-muted text-foreground rounded-full px-3 py-1 text-sm"
                 >
                   {formatGuestName(guest)}
                   {guest.isPrimary && (
-                    <span className="ml-1 text-xs text-muted-foreground">(primary)</span>
+                    <span className="text-muted-foreground ml-1 text-xs">(primary)</span>
                   )}
                 </span>
               ))}
@@ -335,25 +336,25 @@ export default function RSVP() {
 
           {/* Events */}
           <Card className="coastal-shadow mb-6 border-0 p-6 sm:mb-8 sm:p-8">
-            <h3 className="mb-6 text-lg font-medium text-foreground sm:text-xl">Your Events</h3>
+            <h3 className="text-foreground mb-6 text-lg font-medium sm:text-xl">Your Events</h3>
 
             <div className="space-y-6 sm:space-y-8">
               {party.invitedEvents.map(({ event }) => (
-                <div key={event.id} className="rounded-lg bg-muted/30 p-4 sm:p-6">
+                <div key={event.id} className="bg-muted/30 rounded-lg p-4 sm:p-6">
                   <div className="mb-4">
-                    <h4 className="text-base font-medium text-foreground sm:text-lg">
+                    <h4 className="text-foreground text-base font-medium sm:text-lg">
                       {event.name}
                     </h4>
-                    <p className="text-xs text-muted-foreground sm:text-sm">
+                    <p className="text-muted-foreground text-xs sm:text-sm">
                       {formatEventDate(event)}
                     </p>
                     {event.location && (
-                      <p className="text-xs text-muted-foreground sm:text-sm">{event.location}</p>
+                      <p className="text-muted-foreground text-xs sm:text-sm">{event.location}</p>
                     )}
                   </div>
 
                   {/* RSVP for each guest */}
-                  <div className="space-y-4">
+                  <div className="space-y-3">
                     {party.guests.map((guest) => {
                       const rsvpState = rsvpSelections.find(
                         (r) => r.guestId === guest.id && r.eventId === event.id
@@ -364,77 +365,71 @@ export default function RSVP() {
                       return (
                         <div
                           key={`${guest.id}-${event.id}`}
-                          className="rounded-lg bg-background/50 p-3 sm:p-4"
+                          className="bg-background/50 rounded-lg p-4"
                         >
-                          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                            <span className="text-sm font-medium text-foreground">
+                          <div className="mb-3">
+                            <span className="text-foreground text-sm font-medium">
                               {formatGuestName(guest)}
                             </span>
-                            <RadioGroup
-                              value={rsvpState?.status || ''}
-                              onValueChange={(value: string) =>
-                                updateRsvpSelection(guest.id, event.id, value as RsvpStatus)
-                              }
-                              className="flex gap-4"
-                            >
-                              <div className="flex items-center space-x-2">
-                                <RadioGroupItem
-                                  value="attending"
-                                  id={`${guest.id}-${event.id}-yes`}
-                                  data-testid={`radio-${event.slug}-${guest.id}-attending`}
-                                />
-                                <Label
-                                  htmlFor={`${guest.id}-${event.id}-yes`}
-                                  className="cursor-pointer text-sm"
-                                >
-                                  Accept
-                                </Label>
-                              </div>
-                              <div className="flex items-center space-x-2">
-                                <RadioGroupItem
-                                  value="declined"
-                                  id={`${guest.id}-${event.id}-no`}
-                                  data-testid={`radio-${event.slug}-${guest.id}-declined`}
-                                />
-                                <Label
-                                  htmlFor={`${guest.id}-${event.id}-no`}
-                                  className="cursor-pointer text-sm"
-                                >
-                                  Decline
-                                </Label>
-                              </div>
-                            </RadioGroup>
                           </div>
 
-                          {/* Meal Selection */}
+                          {/* Modern toggle buttons for Accept/Decline */}
+                          <div className="flex gap-3">
+                            <button
+                              type="button"
+                              onClick={() => updateRsvpSelection(guest.id, event.id, 'attending')}
+                              data-testid={`radio-${event.slug}-${guest.id}-attending`}
+                              className={cn(
+                                'flex flex-1 items-center justify-center gap-2 rounded-lg border px-4 py-3 text-sm font-medium transition-all',
+                                rsvpState?.status === 'attending'
+                                  ? 'border-primary bg-primary text-primary-foreground coastal-shadow'
+                                  : 'border-border bg-card text-muted-foreground hover:border-primary/40 hover:text-foreground'
+                              )}
+                            >
+                              <Check className="h-4 w-4" />
+                              <span>Joyfully Accept</span>
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => updateRsvpSelection(guest.id, event.id, 'declined')}
+                              data-testid={`radio-${event.slug}-${guest.id}-declined`}
+                              className={cn(
+                                'flex flex-1 items-center justify-center gap-2 rounded-lg border px-4 py-3 text-sm font-medium transition-all',
+                                rsvpState?.status === 'declined'
+                                  ? 'border-muted-foreground/50 bg-muted text-foreground'
+                                  : 'border-border bg-card text-muted-foreground hover:border-muted-foreground/40 hover:text-foreground'
+                              )}
+                            >
+                              <X className="h-4 w-4" />
+                              <span>Regretfully Decline</span>
+                            </button>
+                          </div>
+
+                          {/* Meal Selection - elegant card buttons */}
                           {showMealSelection && (
-                            <div className="mt-3 border-t border-muted pt-3">
-                              <Label className="mb-2 block text-xs text-muted-foreground">
-                                Meal Selection
-                              </Label>
-                              <RadioGroup
-                                value={rsvpState?.mealChoice || ''}
-                                onValueChange={(value: string) =>
-                                  updateMealChoice(guest.id, event.id, value as MealChoice)
-                                }
-                                className="flex flex-wrap gap-3"
-                              >
+                            <div className="border-border/50 mt-4 border-t pt-4">
+                              <div className="text-muted-foreground mb-3 flex items-center gap-2 text-xs">
+                                <Utensils className="h-3 w-3" />
+                                <span className="italic">Select your entrée</span>
+                              </div>
+                              <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
                                 {MEAL_OPTIONS.map((meal) => (
-                                  <div key={meal} className="flex items-center space-x-2">
-                                    <RadioGroupItem
-                                      value={meal}
-                                      id={`${guest.id}-${event.id}-meal-${meal}`}
-                                      data-testid={`radio-meal-${guest.id}-${meal.toLowerCase()}`}
-                                    />
-                                    <Label
-                                      htmlFor={`${guest.id}-${event.id}-meal-${meal}`}
-                                      className="cursor-pointer text-sm"
-                                    >
-                                      {meal}
-                                    </Label>
-                                  </div>
+                                  <button
+                                    key={meal}
+                                    type="button"
+                                    onClick={() => updateMealChoice(guest.id, event.id, meal)}
+                                    data-testid={`radio-meal-${guest.id}-${meal.toLowerCase()}`}
+                                    className={cn(
+                                      'rounded-lg border px-4 py-3 text-sm font-medium transition-all',
+                                      rsvpState?.mealChoice === meal
+                                        ? 'border-primary bg-primary/10 text-foreground coastal-shadow'
+                                        : 'border-border bg-card text-muted-foreground hover:border-primary/40 hover:text-foreground'
+                                    )}
+                                  >
+                                    {meal}
+                                  </button>
                                 ))}
-                              </RadioGroup>
+                              </div>
                             </div>
                           )}
                         </div>
@@ -448,7 +443,7 @@ export default function RSVP() {
 
           {/* Dietary Restrictions */}
           <Card className="coastal-shadow mb-6 border-0 p-6 sm:mb-8 sm:p-8">
-            <h3 className="mb-6 text-lg font-medium text-foreground sm:text-xl">
+            <h3 className="text-foreground mb-6 text-lg font-medium sm:text-xl">
               Dietary Restrictions
             </h3>
             <div className="space-y-4">
@@ -458,7 +453,7 @@ export default function RSVP() {
                   <div key={guest.id}>
                     <Label
                       htmlFor={`dietary-${guest.id}`}
-                      className="mb-2 block text-sm font-medium text-foreground"
+                      className="text-foreground mb-2 block text-sm font-medium"
                     >
                       {formatGuestName(guest)}
                     </Label>
@@ -477,8 +472,8 @@ export default function RSVP() {
 
           {/* Song Requests */}
           <Card className="coastal-shadow mb-6 border-0 p-6 sm:mb-8 sm:p-8">
-            <h3 className="mb-6 text-lg font-medium text-foreground sm:text-xl">Song Requests</h3>
-            <p className="mb-4 text-sm text-muted-foreground">
+            <h3 className="text-foreground mb-6 text-lg font-medium sm:text-xl">Song Requests</h3>
+            <p className="text-muted-foreground mb-4 text-sm">
               Any songs you&apos;d love to hear at the reception? (Max {MAX_SONG_REQUESTS})
             </p>
             <div className="space-y-4">
@@ -487,7 +482,7 @@ export default function RSVP() {
                   <div className="flex-1">
                     <Label
                       htmlFor={`song-${index}`}
-                      className="mb-1 block text-xs text-muted-foreground"
+                      className="text-muted-foreground mb-1 block text-xs"
                     >
                       Song
                     </Label>
@@ -502,7 +497,7 @@ export default function RSVP() {
                   <div className="flex-1">
                     <Label
                       htmlFor={`artist-${index}`}
-                      className="mb-1 block text-xs text-muted-foreground"
+                      className="text-muted-foreground mb-1 block text-xs"
                     >
                       Artist (optional)
                     </Label>
@@ -543,7 +538,7 @@ export default function RSVP() {
 
           {/* Notes */}
           <Card className="coastal-shadow mb-6 border-0 p-6 sm:mb-8 sm:p-8">
-            <h3 className="mb-6 text-lg font-medium text-foreground sm:text-xl">
+            <h3 className="text-foreground mb-6 text-lg font-medium sm:text-xl">
               Message for the Couple
             </h3>
             <Textarea
@@ -556,7 +551,7 @@ export default function RSVP() {
           </Card>
 
           {submitError && (
-            <p className="mb-6 text-center text-sm text-destructive">{submitError}</p>
+            <p className="text-destructive mb-6 text-center text-sm">{submitError}</p>
           )}
 
           <div className="flex flex-col justify-center gap-3 sm:flex-row sm:gap-4">
@@ -593,20 +588,20 @@ export default function RSVP() {
     <CoastalLayout>
       <div className="container mx-auto max-w-4xl px-6 py-12 sm:py-20">
         <div className="mb-12 text-center">
-          <h1 className="elegant-serif mb-6 text-4xl font-light text-foreground sm:text-5xl md:text-6xl">
+          <h1 className="elegant-serif text-foreground mb-6 text-4xl font-light sm:text-5xl md:text-6xl">
             RSVP
           </h1>
-          <p className="text-base text-muted-foreground sm:text-lg">We hope you can join us</p>
+          <p className="text-muted-foreground text-base sm:text-lg">We hope you can join us</p>
         </div>
 
         <SectionDivider />
 
         <Card className="coastal-shadow mx-auto max-w-2xl border-0 p-6 sm:p-10">
-          <h2 className="elegant-serif mb-6 text-center text-2xl text-primary sm:text-3xl">
+          <h2 className="elegant-serif text-primary mb-6 text-center text-2xl sm:text-3xl">
             Find Your Invitation
           </h2>
 
-          <p className="mb-6 text-center text-sm text-muted-foreground sm:mb-8 sm:text-base">
+          <p className="text-muted-foreground mb-6 text-center text-sm sm:mb-8 sm:text-base">
             Please enter your name as it appears on your invitation
           </p>
 
@@ -639,7 +634,7 @@ export default function RSVP() {
               />
             </div>
 
-            {lookupError && <p className="text-sm text-destructive">{lookupError}</p>}
+            {lookupError && <p className="text-destructive text-sm">{lookupError}</p>}
 
             <Button
               onClick={handleLookup}
@@ -652,8 +647,8 @@ export default function RSVP() {
             </Button>
           </div>
 
-          <div className="mt-6 rounded bg-muted/30 p-4 text-center sm:mt-8 sm:p-6">
-            <p className="text-xs text-muted-foreground sm:text-sm">
+          <div className="bg-muted/30 mt-6 rounded p-4 text-center sm:mt-8 sm:p-6">
+            <p className="text-muted-foreground text-xs sm:text-sm">
               Can&apos;t find your invitation? Contact us at{' '}
               <a href="mailto:wedding@carolineandjake.com" className="text-primary underline">
                 wedding@carolineandjake.com
