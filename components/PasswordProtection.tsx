@@ -11,27 +11,15 @@ interface PasswordProtectionProps {
 }
 
 export default function PasswordProtection({ children }: PasswordProtectionProps) {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(() => {
-    // Initialize from sessionStorage if available (client-side only)
-    if (typeof window !== 'undefined') {
-      return sessionStorage.getItem('wedding_authenticated') === 'true';
-    }
-    return null;
-  });
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
   useEffect(() => {
-    // Handle hydration mismatch - check sessionStorage after mount
-    if (isAuthenticated === null) {
-      const authenticated = sessionStorage.getItem('wedding_authenticated') === 'true';
-      if (authenticated) {
-        setIsAuthenticated(true);
-      } else {
-        setIsAuthenticated(false);
-      }
-    }
-  }, [isAuthenticated]);
+    // Check sessionStorage after mount to avoid hydration mismatch
+    const authenticated = sessionStorage.getItem('wedding_authenticated') === 'true';
+    setIsAuthenticated(authenticated);
+  }, []);
 
   const verifyMutation = trpc.auth.verify.useMutation({
     onSuccess: () => {
