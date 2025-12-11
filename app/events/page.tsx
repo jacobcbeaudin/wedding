@@ -59,7 +59,7 @@ export default function Events() {
             </div>
           </Card>
 
-          <Card className="coastal-shadow border-card-border p-6 sm:p-8">
+          <Card className="coastal-shadow border-0 p-6 sm:p-8">
             <div className="grid gap-4 sm:gap-6 md:grid-cols-4">
               <div className="text-center md:text-left">
                 <Image
@@ -97,7 +97,7 @@ export default function Events() {
             </div>
           </Card>
 
-          <Card className="coastal-shadow border-card-border p-6 sm:p-8">
+          <Card className="coastal-shadow border-0 p-6 sm:p-8">
             <div className="grid gap-4 sm:gap-6 md:grid-cols-4">
               <div className="text-center md:text-left">
                 <Image

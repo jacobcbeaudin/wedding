@@ -112,7 +112,7 @@ export default function Venue() {
         </Card>
 
         <div className="grid gap-6 sm:gap-8 md:grid-cols-2">
-          <Card className="coastal-shadow border-card-border p-6 sm:p-8">
+          <Card className="coastal-shadow border-0 p-6 sm:p-8">
             <div className="flex items-start gap-4">
               <Plane className="mt-1 h-5 w-5 flex-shrink-0 text-primary sm:h-6 sm:w-6" />
               <div>
@@ -141,7 +141,7 @@ export default function Venue() {
             </div>
           </Card>
 
-          <Card className="coastal-shadow border-card-border p-6 sm:p-8">
+          <Card className="coastal-shadow border-0 p-6 sm:p-8">
             <div className="flex items-start gap-4">
               <Car className="mt-1 h-5 w-5 flex-shrink-0 text-primary sm:h-6 sm:w-6" />
               <div>
