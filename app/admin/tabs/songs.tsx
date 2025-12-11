@@ -1,0 +1,118 @@
+'use client';
+
+import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { trpc } from '@/components/providers/trpc-provider';
+
+interface SongsTabProps {
+  adminToken: string;
+}
+
+export function SongsTab({ adminToken }: SongsTabProps) {
+  const utils = trpc.useUtils();
+  const { data: songs, isLoading } = trpc.admin.listSongRequests.useQuery({ adminToken });
+
+  const deleteMutation = trpc.admin.deleteSongRequest.useMutation({
+    onSuccess: () => {
+      utils.admin.listSongRequests.invalidate();
+      utils.admin.getDashboardStats.invalidate();
+    },
+  });
+
+  const handleDelete = (id: string, song: string) => {
+    if (confirm(`Remove "${song}" from requests?`)) {
+      deleteMutation.mutate({ adminToken, id });
+    }
+  };
+
+  const downloadCSV = () => {
+    if (!songs) return;
+
+    const headers = ['Song', 'Artist', 'Requested By', 'Requested At'];
+    const rows = songs.map((song) => [
+      song.song,
+      song.artist || '',
+      song.party.name,
+      new Date(song.createdAt).toLocaleDateString(),
+    ]);
+
+    const csv = [headers, ...rows]
+      .map((row) => row.map((cell) => `"${cell}"`).join(','))
+      .join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `song-requests-${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  if (isLoading) {
+    return <div className="py-8 text-center text-muted-foreground">Loading...</div>;
+  }
+
+  return (
+    <Card className="p-4">
+      <div className="mb-4 flex items-center justify-between">
+        <h2 className="text-lg font-semibold">Song Requests ({songs?.length || 0})</h2>
+        <Button size="sm" variant="outline" onClick={downloadCSV} disabled={!songs?.length}>
+          Export CSV
+        </Button>
+      </div>
+
+      <div className="overflow-x-auto">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Song</TableHead>
+              <TableHead>Artist</TableHead>
+              <TableHead>Requested By</TableHead>
+              <TableHead>Date</TableHead>
+              <TableHead className="w-[80px]">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {songs?.map((song) => (
+              <TableRow key={song.id}>
+                <TableCell className="font-medium">{song.song}</TableCell>
+                <TableCell>
+                  {song.artist || <span className="text-muted-foreground">-</span>}
+                </TableCell>
+                <TableCell>{song.party.name}</TableCell>
+                <TableCell className="text-sm text-muted-foreground">
+                  {new Date(song.createdAt).toLocaleDateString()}
+                </TableCell>
+                <TableCell>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-destructive"
+                    onClick={() => handleDelete(song.id, song.song)}
+                  >
+                    Remove
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))}
+            {songs?.length === 0 && (
+              <TableRow>
+                <TableCell colSpan={5} className="py-8 text-center text-muted-foreground">
+                  No song requests yet
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </div>
+    </Card>
+  );
+}
