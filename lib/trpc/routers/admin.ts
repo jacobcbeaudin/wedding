@@ -43,7 +43,7 @@ export const adminRouter = router({
   // ============================================================================
 
   login: publicProcedure
-    .input(z.object({ password: z.string().min(1) }))
+    .input(z.object({ password: z.string().min(1, { error: 'Password is required' }) }))
     .mutation(async ({ input, ctx }) => {
       // Rate limit admin login attempts (3 per minute per IP)
       if (adminRatelimit) {
@@ -103,7 +103,7 @@ export const adminRouter = router({
       z.object({
         adminToken: z.string(),
         name: z.string().min(1),
-        email: z.string().email(),
+        email: z.email(),
         notes: z.string().nullable(),
       })
     )
@@ -126,9 +126,9 @@ export const adminRouter = router({
     .input(
       z.object({
         adminToken: z.string(),
-        id: z.string().uuid(),
+        id: z.uuid(),
         name: z.string().min(1),
-        email: z.string().email(),
+        email: z.email(),
         notes: z.string().nullable(),
       })
     )
@@ -149,7 +149,7 @@ export const adminRouter = router({
     }),
 
   deleteParty: publicProcedure
-    .input(z.object({ adminToken: z.string(), id: z.string().uuid() }))
+    .input(z.object({ adminToken: z.string(), id: z.uuid() }))
     .mutation(async ({ input }) => {
       verifyAdmin(input.adminToken);
 
@@ -185,7 +185,7 @@ export const adminRouter = router({
     .input(
       z.object({
         adminToken: z.string(),
-        partyId: z.string().uuid(),
+        partyId: z.uuid(),
         firstName: z.string().min(1),
         lastName: z.string().min(1),
         isPrimary: z.boolean().default(false),
@@ -215,7 +215,7 @@ export const adminRouter = router({
     .input(
       z.object({
         adminToken: z.string(),
-        id: z.string().uuid(),
+        id: z.uuid(),
         firstName: z.string().min(1),
         lastName: z.string().min(1),
         isPrimary: z.boolean(),
@@ -242,7 +242,7 @@ export const adminRouter = router({
     }),
 
   deleteGuest: publicProcedure
-    .input(z.object({ adminToken: z.string(), id: z.string().uuid() }))
+    .input(z.object({ adminToken: z.string(), id: z.uuid() }))
     .mutation(async ({ input }) => {
       verifyAdmin(input.adminToken);
 
@@ -275,7 +275,7 @@ export const adminRouter = router({
         date: z.string().nullable(),
         location: z.string().nullable(),
         description: z.string().nullable(),
-        displayOrder: z.number().int().default(0),
+        displayOrder: z.int().default(0),
       })
     )
     .mutation(async ({ input }) => {
@@ -300,13 +300,13 @@ export const adminRouter = router({
     .input(
       z.object({
         adminToken: z.string(),
-        id: z.string().uuid(),
+        id: z.uuid(),
         slug: z.string().min(1),
         name: z.string().min(1),
         date: z.string().nullable(),
         location: z.string().nullable(),
         description: z.string().nullable(),
-        displayOrder: z.number().int(),
+        displayOrder: z.int(),
       })
     )
     .mutation(async ({ input }) => {
@@ -329,7 +329,7 @@ export const adminRouter = router({
     }),
 
   deleteEvent: publicProcedure
-    .input(z.object({ adminToken: z.string(), id: z.string().uuid() }))
+    .input(z.object({ adminToken: z.string(), id: z.uuid() }))
     .mutation(async ({ input }) => {
       verifyAdmin(input.adminToken);
 
@@ -360,8 +360,8 @@ export const adminRouter = router({
     .input(
       z.object({
         adminToken: z.string(),
-        partyId: z.string().uuid(),
-        eventId: z.string().uuid(),
+        partyId: z.uuid(),
+        eventId: z.uuid(),
       })
     )
     .mutation(async ({ input }) => {
@@ -379,7 +379,7 @@ export const adminRouter = router({
     }),
 
   deleteInvitation: publicProcedure
-    .input(z.object({ adminToken: z.string(), id: z.string().uuid() }))
+    .input(z.object({ adminToken: z.string(), id: z.uuid() }))
     .mutation(async ({ input }) => {
       verifyAdmin(input.adminToken);
 
@@ -392,8 +392,8 @@ export const adminRouter = router({
     .input(
       z.object({
         adminToken: z.string(),
-        partyId: z.string().uuid(),
-        eventIds: z.array(z.string().uuid()),
+        partyId: z.uuid(),
+        eventIds: z.array(z.uuid()),
       })
     )
     .mutation(async ({ input }) => {
@@ -459,7 +459,7 @@ export const adminRouter = router({
     }),
 
   deleteSongRequest: publicProcedure
-    .input(z.object({ adminToken: z.string(), id: z.string().uuid() }))
+    .input(z.object({ adminToken: z.string(), id: z.uuid() }))
     .mutation(async ({ input }) => {
       verifyAdmin(input.adminToken);
 
