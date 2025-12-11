@@ -1,7 +1,6 @@
 'use client';
 
 import Link from 'next/link';
-import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { Menu } from 'lucide-react';
 import { useState } from 'react';
@@ -55,14 +54,11 @@ export default function Navigation() {
       <div className="container mx-auto px-6 py-5">
         <div className="flex items-center justify-between">
           {/* Logo - links to home */}
-          <Link href="/" className="transition-opacity hover:opacity-80">
-            <Image
-              src="/favicon.png"
-              alt="C & J - Home"
-              width={32}
-              height={32}
-              className="h-8 w-8"
-            />
+          <Link
+            href="/"
+            className="elegant-serif text-xl tracking-wide text-primary transition-opacity hover:opacity-80"
+          >
+            C & J
           </Link>
 
           {/* Desktop Navigation */}
