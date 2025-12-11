@@ -135,7 +135,7 @@ export default function OurStory() {
           </Card>
         </div>
 
-        <Card className="border-0 bg-secondary/30 p-6 sm:p-8">
+        <Card className="coastal-shadow border-0 p-6 sm:p-8">
           <h3 className="elegant-serif mb-4 text-center text-xl text-primary sm:mb-6 sm:text-2xl">
             Fun Facts About Us
           </h3>
