@@ -1,0 +1,357 @@
+/**
+ * RSVP router - handles party lookup and RSVP submission.
+ * Relational model: parties → guests → rsvps, with events and invitations.
+ */
+
+import { eq, and, asc, inArray } from 'drizzle-orm';
+import { router, publicProcedure, TRPCError } from '../init';
+import {
+  db,
+  parties,
+  guests,
+  events,
+  invitations,
+  rsvps,
+  rsvpHistory,
+  songRequests,
+} from '@/lib/db';
+import {
+  lookupGuestSchema,
+  getPartySchema,
+  submitRsvpSchema,
+  type PartyWithDetails,
+  type GuestPublic,
+  type EventPublic,
+  type RsvpPublic,
+  type SongRequestPublic,
+} from '@/lib/validations/rsvp';
+import { RSVP_DEADLINE } from '@/lib/config/rsvp';
+import { MEAL_REQUIRED_EVENT } from '@/lib/config/meals';
+import { normalizeName, sanitizeText } from '@/lib/trpc/utils';
+
+// ============================================================================
+// HELPER FUNCTIONS
+// ============================================================================
+
+/**
+ * Checks if RSVP deadline has passed.
+ */
+function checkDeadline(): void {
+  if (RSVP_DEADLINE && new Date() > RSVP_DEADLINE) {
+    throw new TRPCError({
+      code: 'FORBIDDEN',
+      message: 'The RSVP deadline has passed.',
+    });
+  }
+}
+
+/**
+ * Fetches a party with all related data for the RSVP form.
+ */
+async function fetchPartyWithDetails(partyId: string): Promise<PartyWithDetails> {
+  // Fetch party
+  const [party] = await db.select().from(parties).where(eq(parties.id, partyId)).limit(1);
+
+  if (!party) {
+    throw new TRPCError({
+      code: 'NOT_FOUND',
+      message: 'Party not found',
+    });
+  }
+
+  // Fetch guests in this party (primary first)
+  const partyGuests = await db
+    .select()
+    .from(guests)
+    .where(eq(guests.partyId, partyId))
+    .orderBy(asc(guests.isPrimary)); // false < true, so primary comes last with asc
+
+  // Re-order so primary is first
+  partyGuests.sort((a, b) => (b.isPrimary ? 1 : 0) - (a.isPrimary ? 1 : 0));
+
+  // Fetch all events this party is invited to
+  const partyInvitations = await db
+    .select({
+      invitation: invitations,
+      event: events,
+    })
+    .from(invitations)
+    .innerJoin(events, eq(invitations.eventId, events.id))
+    .where(eq(invitations.partyId, partyId))
+    .orderBy(asc(events.displayOrder));
+
+  // Fetch all RSVPs for guests in this party
+  const guestIds = partyGuests.map((g) => g.id);
+  const partyRsvps =
+    guestIds.length > 0
+      ? await db.select().from(rsvps).where(inArray(rsvps.guestId, guestIds))
+      : [];
+
+  // Fetch song requests for this party
+  const partySongRequests = await db
+    .select()
+    .from(songRequests)
+    .where(eq(songRequests.partyId, partyId));
+
+  // Transform to response types
+  const guestsPublic: GuestPublic[] = partyGuests.map((g) => ({
+    id: g.id,
+    firstName: g.firstName,
+    lastName: g.lastName,
+    isPrimary: g.isPrimary,
+    isChild: g.isChild,
+    dietaryRestrictions: g.dietaryRestrictions,
+  }));
+
+  const invitedEvents = partyInvitations.map(({ event }) => {
+    const eventPublic: EventPublic = {
+      id: event.id,
+      slug: event.slug,
+      name: event.name,
+      date: event.date?.toISOString() ?? null,
+      location: event.location,
+      description: event.description,
+      displayOrder: event.displayOrder,
+    };
+
+    const eventRsvps: RsvpPublic[] = partyRsvps
+      .filter((r) => r.eventId === event.id)
+      .map((r) => ({
+        guestId: r.guestId,
+        eventId: r.eventId,
+        status: r.status,
+        mealChoice: r.mealChoice,
+      }));
+
+    return { event: eventPublic, rsvps: eventRsvps };
+  });
+
+  const songRequestsPublic: SongRequestPublic[] = partySongRequests.map((s) => ({
+    id: s.id,
+    song: s.song,
+    artist: s.artist,
+  }));
+
+  return {
+    id: party.id,
+    name: party.name,
+    email: party.email,
+    notes: party.notes,
+    submittedAt: party.submittedAt?.toISOString() ?? null,
+    guests: guestsPublic,
+    invitedEvents,
+    songRequests: songRequestsPublic,
+  };
+}
+
+// ============================================================================
+// ROUTER
+// ============================================================================
+
+export const rsvpRouter = router({
+  /**
+   * Look up a guest by name and return their party's full context.
+   */
+  lookup: publicProcedure.input(lookupGuestSchema).mutation(async ({ input }) => {
+    const firstName = normalizeName(input.firstName);
+    const lastName = normalizeName(input.lastName);
+
+    if (!firstName || !lastName) {
+      throw new TRPCError({
+        code: 'BAD_REQUEST',
+        message: 'Please enter a valid first and last name.',
+      });
+    }
+
+    // Find the guest
+    const [guest] = await db
+      .select()
+      .from(guests)
+      .where(and(eq(guests.firstName, firstName), eq(guests.lastName, lastName)))
+      .limit(1);
+
+    if (!guest) {
+      throw new TRPCError({
+        code: 'NOT_FOUND',
+        message:
+          "We couldn't find your name on the guest list. Please check the spelling matches your invitation.",
+      });
+    }
+
+    // Return the full party context
+    const party = await fetchPartyWithDetails(guest.partyId);
+    return { party };
+  }),
+
+  /**
+   * Get a party by ID (for returning to edit RSVP).
+   */
+  getParty: publicProcedure.input(getPartySchema).query(async ({ input }) => {
+    const party = await fetchPartyWithDetails(input.partyId);
+    return { party };
+  }),
+
+  /**
+   * Submit RSVPs for all guests in a party.
+   */
+  submit: publicProcedure.input(submitRsvpSchema).mutation(async ({ input }) => {
+    // Check deadline
+    checkDeadline();
+
+    const { partyId, rsvps: rsvpInputs, dietaryUpdates, songRequests: songInputs, notes } = input;
+
+    // Verify party exists
+    const [party] = await db.select().from(parties).where(eq(parties.id, partyId)).limit(1);
+
+    if (!party) {
+      throw new TRPCError({
+        code: 'NOT_FOUND',
+        message: 'Party not found',
+      });
+    }
+
+    // Get all guests in this party for validation
+    const partyGuests = await db.select().from(guests).where(eq(guests.partyId, partyId));
+
+    const partyGuestIds = new Set(partyGuests.map((g) => g.id));
+
+    // Get all events this party is invited to
+    const partyInvitations = await db
+      .select({
+        invitation: invitations,
+        event: events,
+      })
+      .from(invitations)
+      .innerJoin(events, eq(invitations.eventId, events.id))
+      .where(eq(invitations.partyId, partyId));
+
+    const invitedEventIds = new Set(partyInvitations.map((i) => i.invitation.eventId));
+    const eventByIdMap = new Map(partyInvitations.map((i) => [i.event.id, i.event]));
+
+    // Get existing RSVPs for history tracking
+    const existingRsvps = await db
+      .select()
+      .from(rsvps)
+      .where(inArray(rsvps.guestId, Array.from(partyGuestIds)));
+
+    const existingRsvpMap = new Map(existingRsvps.map((r) => [`${r.guestId}-${r.eventId}`, r]));
+
+    // Validate and upsert RSVPs
+    const now = new Date();
+    for (const rsvpInput of rsvpInputs) {
+      // Validate guest belongs to this party
+      if (!partyGuestIds.has(rsvpInput.guestId)) {
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'Guest does not belong to this party',
+        });
+      }
+
+      // Validate party is invited to this event
+      if (!invitedEventIds.has(rsvpInput.eventId)) {
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'Party is not invited to this event',
+        });
+      }
+
+      // Validate meal choice for wedding event
+      const event = eventByIdMap.get(rsvpInput.eventId);
+      if (
+        event?.slug === MEAL_REQUIRED_EVENT &&
+        rsvpInput.status === 'attending' &&
+        !rsvpInput.mealChoice
+      ) {
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'Meal selection is required for attending guests',
+        });
+      }
+
+      // Check for existing RSVP to log history
+      const existingKey = `${rsvpInput.guestId}-${rsvpInput.eventId}`;
+      const existingRsvp = existingRsvpMap.get(existingKey);
+
+      if (
+        existingRsvp &&
+        (existingRsvp.status !== rsvpInput.status ||
+          existingRsvp.mealChoice !== rsvpInput.mealChoice)
+      ) {
+        // Log previous state to history
+        await db.insert(rsvpHistory).values({
+          rsvpId: existingRsvp.id,
+          previousStatus: existingRsvp.status,
+          previousMealChoice: existingRsvp.mealChoice,
+          changedAt: now,
+        });
+      }
+
+      // Upsert RSVP
+      await db
+        .insert(rsvps)
+        .values({
+          guestId: rsvpInput.guestId,
+          eventId: rsvpInput.eventId,
+          status: rsvpInput.status,
+          mealChoice: rsvpInput.mealChoice ?? null,
+          updatedAt: now,
+        })
+        .onConflictDoUpdate({
+          target: [rsvps.guestId, rsvps.eventId],
+          set: {
+            status: rsvpInput.status,
+            mealChoice: rsvpInput.mealChoice ?? null,
+            updatedAt: now,
+          },
+        });
+    }
+
+    // Update dietary restrictions
+    for (const dietaryUpdate of dietaryUpdates) {
+      if (!partyGuestIds.has(dietaryUpdate.guestId)) {
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'Guest does not belong to this party',
+        });
+      }
+
+      await db
+        .update(guests)
+        .set({
+          dietaryRestrictions:
+            sanitizeText(dietaryUpdate.dietaryRestrictions ?? undefined, 500) ?? null,
+        })
+        .where(eq(guests.id, dietaryUpdate.guestId));
+    }
+
+    // Replace song requests for this party
+    await db.delete(songRequests).where(eq(songRequests.partyId, partyId));
+
+    if (songInputs.length > 0) {
+      for (const songInput of songInputs) {
+        await db.insert(songRequests).values({
+          partyId,
+          song: sanitizeText(songInput.song, 200) ?? '',
+          artist: sanitizeText(songInput.artist ?? undefined, 200) ?? null,
+        });
+      }
+    }
+
+    // Update party submission timestamp and notes
+    await db
+      .update(parties)
+      .set({
+        submittedAt: now,
+        notes: sanitizeText(notes ?? undefined, 500) ?? null,
+      })
+      .where(eq(parties.id, partyId));
+
+    // Return updated party data
+    const updatedParty = await fetchPartyWithDetails(partyId);
+    return {
+      success: true,
+      party: updatedParty,
+      message: 'Thank you! Your RSVP has been submitted.',
+    };
+  }),
+});

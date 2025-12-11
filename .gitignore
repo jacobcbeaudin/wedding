@@ -1,12 +1,29 @@
+# Dependencies
 node_modules
+
+# Next.js
+.next
+out
+
+# Build
 dist
-.DS_Store
-server/public
-vite.config.ts.*
-*.tar.gz
+
+# Environment
 .env
 .env.local
+.env.*.local
+
+# Vercel
 .vercel
-.local
+
+# IDE
+.DS_Store
+*.local
+
+# Testing
 test-results
 playwright-report
+
+# Misc
+*.tar.gz
+*.log
