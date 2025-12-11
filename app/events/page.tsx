@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import CoastalLayout from '@/components/CoastalLayout';
 import SectionDivider from '@/components/SectionDivider';
 import { Card } from '@/components/ui/card';
@@ -21,7 +22,13 @@ export default function Events() {
           <Card className="coastal-shadow border-0 p-6 sm:p-8">
             <div className="grid gap-4 sm:gap-6 md:grid-cols-4">
               <div className="text-center md:text-left">
-                <div className="mb-4 text-4xl sm:text-5xl">&#129511;</div>
+                <Image
+                  src="/images/icons/tea-ceremony.png"
+                  alt="Tea ceremony"
+                  width={112}
+                  height={112}
+                  className="mx-auto mb-4 h-20 w-20 sm:h-28 sm:w-28 md:mx-0"
+                />
                 <div className="elegant-serif text-2xl text-primary sm:text-3xl">Tea Ceremony</div>
               </div>
               <div className="md:col-span-3">
@@ -55,7 +62,13 @@ export default function Events() {
           <Card className="coastal-shadow border-card-border p-6 sm:p-8">
             <div className="grid gap-4 sm:gap-6 md:grid-cols-4">
               <div className="text-center md:text-left">
-                <div className="mb-4 text-4xl sm:text-5xl">&#129346;</div>
+                <Image
+                  src="/images/icons/welcome-party.png"
+                  alt="Welcome party"
+                  width={112}
+                  height={112}
+                  className="mx-auto mb-4 h-20 w-20 sm:h-28 sm:w-28 md:mx-0"
+                />
                 <div className="elegant-serif text-2xl text-primary sm:text-3xl">Welcome Party</div>
               </div>
               <div className="md:col-span-3">
@@ -87,7 +100,13 @@ export default function Events() {
           <Card className="coastal-shadow border-card-border p-6 sm:p-8">
             <div className="grid gap-4 sm:gap-6 md:grid-cols-4">
               <div className="text-center md:text-left">
-                <div className="mb-4 text-4xl sm:text-5xl">&#128210;</div>
+                <Image
+                  src="/images/icons/wedding.png"
+                  alt="Wedding"
+                  width={112}
+                  height={112}
+                  className="mx-auto mb-4 h-20 w-20 sm:h-28 sm:w-28 md:mx-0"
+                />
                 <div className="elegant-serif text-2xl text-primary sm:text-3xl">Wedding Day</div>
               </div>
               <div className="md:col-span-3">
