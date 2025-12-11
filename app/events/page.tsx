@@ -81,7 +81,9 @@ export default function Events() {
                   </div>
                   <div className="flex flex-col sm:flex-row sm:gap-8">
                     <span className="min-w-[120px] font-medium text-foreground">Location:</span>
-                    <span className="text-muted-foreground">Terrace & Lounge</span>
+                    <span className="text-muted-foreground">
+                      Anton & Michel Restaurant, Mission St & 7th Ave, Carmel-By-The-Sea
+                    </span>
                   </div>
                   <div className="flex flex-col sm:flex-row sm:gap-8">
                     <span className="min-w-[120px] font-medium text-foreground">Dress Code:</span>
