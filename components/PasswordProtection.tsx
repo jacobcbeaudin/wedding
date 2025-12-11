@@ -55,7 +55,7 @@ export default function PasswordProtection({ children }: PasswordProtectionProps
     <div
       className="flex min-h-screen items-center justify-center p-6"
       style={{
-        backgroundImage: `linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url(/images/photo-01.webp)`,
+        backgroundImage: `url(/images/photo-06.webp)`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
       }}
@@ -65,7 +65,6 @@ export default function PasswordProtection({ children }: PasswordProtectionProps
           <h1 className="elegant-serif mb-4 text-5xl tracking-wide text-primary">
             Caroline & Jake
           </h1>
-          <p className="elegant-serif text-xl text-muted-foreground">September 12, 2026</p>
         </div>
 
         <div className="mb-8">
@@ -103,10 +102,6 @@ export default function PasswordProtection({ children }: PasswordProtectionProps
             {verifyMutation.isPending ? 'Checking...' : 'Enter Site'}
           </Button>
         </form>
-
-        <p className="mt-8 text-xs text-muted-foreground">
-          Having trouble? Contact Jake or Caroline directly.
-        </p>
       </Card>
     </div>
   );

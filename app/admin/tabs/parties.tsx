@@ -23,6 +23,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { trpc } from '@/components/providers/trpc-provider';
+import { Plus, Pencil, Trash2, Search, CheckCircle, Clock } from 'lucide-react';
 
 interface PartiesTabProps {
   adminToken: string;
@@ -143,36 +144,48 @@ export function PartiesTab({ adminToken }: PartiesTabProps) {
   });
 
   if (isLoading) {
-    return <div className="py-8 text-center text-muted-foreground">Loading...</div>;
+    return (
+      <Card className="border-0 p-8 shadow-sm">
+        <div className="flex items-center justify-center">
+          <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+        </div>
+      </Card>
+    );
   }
 
   return (
-    <Card className="p-4">
+    <Card className="border-0 p-4 shadow-sm">
       <div className="mb-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <h2 className="text-lg font-semibold">
           Parties ({filteredParties?.length || 0}
           {filteredParties?.length !== parties?.length && ` of ${parties?.length}`})
         </h2>
-        <div className="flex flex-1 gap-2 sm:max-w-md">
-          <Input
-            placeholder="Search by name, email, or guest..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="flex-1"
-          />
+        <div className="flex flex-1 gap-2 sm:max-w-lg">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              placeholder="Search by name, email, or guest..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-9"
+            />
+          </div>
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value as 'all' | 'responded' | 'pending')}
             className="rounded-md border bg-background px-3 py-2 text-sm"
           >
-            <option value="all">All</option>
+            <option value="all">All Status</option>
             <option value="responded">Responded</option>
             <option value="pending">Pending</option>
           </select>
         </div>
         <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
           <DialogTrigger asChild>
-            <Button size="sm">Add Party</Button>
+            <Button size="sm" className="gap-2">
+              <Plus className="h-4 w-4" />
+              Add Party
+            </Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
@@ -254,16 +267,23 @@ export function PartiesTab({ adminToken }: PartiesTabProps) {
                 </TableCell>
                 <TableCell>
                   {party.submittedAt ? (
-                    <Badge variant="default">Responded</Badge>
+                    <Badge variant="default" className="gap-1 bg-green-600">
+                      <CheckCircle className="h-3 w-3" />
+                      Responded
+                    </Badge>
                   ) : (
-                    <Badge variant="outline">Pending</Badge>
+                    <Badge variant="outline" className="gap-1 text-muted-foreground">
+                      <Clock className="h-3 w-3" />
+                      Pending
+                    </Badge>
                   )}
                 </TableCell>
                 <TableCell>
                   <div className="flex gap-1">
                     <Button
                       variant="ghost"
-                      size="sm"
+                      size="icon"
+                      className="h-8 w-8"
                       onClick={() =>
                         setEditingParty({
                           id: party.id,
@@ -273,15 +293,15 @@ export function PartiesTab({ adminToken }: PartiesTabProps) {
                         })
                       }
                     >
-                      Edit
+                      <Pencil className="h-4 w-4" />
                     </Button>
                     <Button
                       variant="ghost"
-                      size="sm"
-                      className="text-destructive"
+                      size="icon"
+                      className="h-8 w-8 text-destructive hover:text-destructive"
                       onClick={() => handleDelete(party.id, party.name)}
                     >
-                      Delete
+                      <Trash2 className="h-4 w-4" />
                     </Button>
                   </div>
                 </TableCell>
