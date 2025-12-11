@@ -38,26 +38,41 @@ export default function CountdownTimer() {
   }, [calculateTimeLeft]);
 
   return (
-    <div className="mx-auto max-w-3xl">
-      <h2 className="elegant-serif mb-8 text-center text-3xl text-foreground">
-        Counting Down to Our Big Day
-      </h2>
-
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-        {Object.entries(timeLeft).map(([unit, value]) => (
-          <div key={unit} className="text-center">
-            <div
-              className="coastal-shadow rounded-lg border border-card-border bg-card p-4 sm:p-6"
-              data-testid={`countdown-${unit}`}
-            >
-              <div className="elegant-serif mb-2 text-3xl font-light text-primary sm:text-5xl">
-                {value.toString().padStart(2, '0')}
-              </div>
-              <div className="text-xs uppercase tracking-widest text-muted-foreground">{unit}</div>
-            </div>
-          </div>
-        ))}
+    <div className="text-center">
+      <div className="inline-flex items-baseline gap-1 sm:gap-2">
+        <span
+          className="elegant-serif text-3xl text-primary sm:text-4xl"
+          data-testid="countdown-days"
+        >
+          {timeLeft.days}
+        </span>
+        <span className="text-sm text-muted-foreground sm:text-base">days</span>
+        <span className="px-1 text-muted-foreground/50 sm:px-2">&middot;</span>
+        <span
+          className="elegant-serif text-3xl text-primary sm:text-4xl"
+          data-testid="countdown-hours"
+        >
+          {timeLeft.hours}
+        </span>
+        <span className="text-sm text-muted-foreground sm:text-base">hrs</span>
+        <span className="px-1 text-muted-foreground/50 sm:px-2">&middot;</span>
+        <span
+          className="elegant-serif text-3xl text-primary sm:text-4xl"
+          data-testid="countdown-minutes"
+        >
+          {timeLeft.minutes}
+        </span>
+        <span className="text-sm text-muted-foreground sm:text-base">min</span>
+        <span className="px-1 text-muted-foreground/50 sm:px-2">&middot;</span>
+        <span
+          className="elegant-serif text-3xl text-primary sm:text-4xl"
+          data-testid="countdown-seconds"
+        >
+          {timeLeft.seconds}
+        </span>
+        <span className="text-sm text-muted-foreground sm:text-base">sec</span>
       </div>
+      <p className="mt-3 text-sm text-muted-foreground sm:mt-4">until we say &ldquo;I do&rdquo;</p>
     </div>
   );
 }
