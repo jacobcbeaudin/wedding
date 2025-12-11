@@ -2,47 +2,47 @@
 @tailwind components;
 @tailwind utilities;
 
-/* LIGHT MODE - Coastal Luxury Theme */
+/* LIGHT MODE - Modern Coastal Theme */
 :root {
-  --button-outline: rgba(0, 0, 0, 0.1);
-  --badge-outline: rgba(0, 0, 0, 0.05);
-  --opaque-button-border-intensity: -8;
-  --elevate-1: rgba(0, 0, 0, 0.03);
-  --elevate-2: rgba(0, 0, 0, 0.08);
-  --background: 40 20% 97%;
-  --foreground: 210 20% 20%;
-  --border: 40 15% 85%;
-  --card: 40 20% 97%;
-  --card-foreground: 210 20% 20%;
-  --card-border: 40 15% 88%;
-  --sidebar: 40 25% 95%;
-  --sidebar-foreground: 210 20% 20%;
-  --sidebar-border: 40 15% 88%;
-  --sidebar-primary: 205 20% 65%;
+  --button-outline: rgba(0, 0, 0, 0.06);
+  --badge-outline: rgba(0, 0, 0, 0.04);
+  --opaque-button-border-intensity: -6;
+  --elevate-1: rgba(0, 0, 0, 0.02);
+  --elevate-2: rgba(0, 0, 0, 0.05);
+  --background: 200 20% 98%;
+  --foreground: 210 25% 15%;
+  --border: 200 12% 88%;
+  --card: 200 15% 99%;
+  --card-foreground: 210 25% 15%;
+  --card-border: 200 12% 90%;
+  --sidebar: 200 15% 96%;
+  --sidebar-foreground: 210 25% 15%;
+  --sidebar-border: 200 12% 88%;
+  --sidebar-primary: 200 35% 52%;
   --sidebar-primary-foreground: 0 0% 100%;
-  --sidebar-accent: 40 25% 85%;
-  --sidebar-accent-foreground: 210 20% 20%;
-  --sidebar-ring: 205 20% 65%;
+  --sidebar-accent: 200 15% 92%;
+  --sidebar-accent-foreground: 210 25% 15%;
+  --sidebar-ring: 200 35% 52%;
   --popover: 0 0% 100%;
-  --popover-foreground: 210 20% 20%;
-  --popover-border: 40 15% 88%;
-  --primary: 205 20% 65%;
+  --popover-foreground: 210 25% 15%;
+  --popover-border: 200 12% 88%;
+  --primary: 200 35% 52%;
   --primary-foreground: 0 0% 100%;
-  --secondary: 40 30% 94%;
-  --secondary-foreground: 210 20% 20%;
-  --muted: 40 25% 90%;
-  --muted-foreground: 210 15% 40%;
-  --accent: 205 15% 88%;
-  --accent-foreground: 210 20% 20%;
-  --destructive: 0 72% 42%;
-  --destructive-foreground: 0 72% 98%;
-  --input: 40 15% 88%;
-  --ring: 205 20% 65%;
-  --chart-1: 205 20% 65%;
-  --chart-2: 40 25% 75%;
-  --chart-3: 35 30% 70%;
-  --chart-4: 210 15% 70%;
-  --chart-5: 195 25% 72%;
+  --secondary: 200 12% 94%;
+  --secondary-foreground: 210 25% 15%;
+  --muted: 200 10% 92%;
+  --muted-foreground: 210 12% 45%;
+  --accent: 200 15% 92%;
+  --accent-foreground: 210 25% 15%;
+  --destructive: 0 65% 50%;
+  --destructive-foreground: 0 0% 100%;
+  --input: 200 12% 90%;
+  --ring: 200 35% 52%;
+  --chart-1: 200 35% 52%;
+  --chart-2: 195 25% 65%;
+  --chart-3: 185 20% 60%;
+  --chart-4: 205 20% 62%;
+  --chart-5: 190 28% 58%;
   --font-sans: Forum, serif;
   --font-serif: Forum, serif;
   --font-mono: Menlo, monospace;
@@ -102,45 +102,45 @@
 }
 
 .dark {
-  --button-outline: rgba(255, 255, 255, 0.1);
-  --badge-outline: rgba(255, 255, 255, 0.05);
-  --opaque-button-border-intensity: 9;
-  --elevate-1: rgba(255, 255, 255, 0.04);
-  --elevate-2: rgba(255, 255, 255, 0.09);
-  --background: 210 20% 15%;
-  --foreground: 40 25% 95%;
-  --border: 210 15% 28%;
-  --card: 210 18% 18%;
-  --card-foreground: 40 25% 95%;
-  --card-border: 210 15% 24%;
-  --sidebar: 210 20% 16%;
-  --sidebar-foreground: 40 25% 95%;
-  --sidebar-border: 210 15% 28%;
-  --sidebar-primary: 205 20% 55%;
+  --button-outline: rgba(255, 255, 255, 0.08);
+  --badge-outline: rgba(255, 255, 255, 0.04);
+  --opaque-button-border-intensity: 8;
+  --elevate-1: rgba(255, 255, 255, 0.03);
+  --elevate-2: rgba(255, 255, 255, 0.07);
+  --background: 205 25% 12%;
+  --foreground: 200 15% 92%;
+  --border: 205 18% 22%;
+  --card: 205 22% 14%;
+  --card-foreground: 200 15% 92%;
+  --card-border: 205 18% 20%;
+  --sidebar: 205 25% 13%;
+  --sidebar-foreground: 200 15% 92%;
+  --sidebar-border: 205 18% 22%;
+  --sidebar-primary: 200 40% 55%;
   --sidebar-primary-foreground: 0 0% 100%;
-  --sidebar-accent: 40 15% 30%;
-  --sidebar-accent-foreground: 40 25% 95%;
-  --sidebar-ring: 205 20% 55%;
-  --popover: 210 18% 20%;
-  --popover-foreground: 40 25% 95%;
-  --popover-border: 210 15% 28%;
-  --primary: 205 20% 55%;
+  --sidebar-accent: 205 20% 22%;
+  --sidebar-accent-foreground: 200 15% 92%;
+  --sidebar-ring: 200 40% 55%;
+  --popover: 205 22% 16%;
+  --popover-foreground: 200 15% 92%;
+  --popover-border: 205 18% 22%;
+  --primary: 200 40% 55%;
   --primary-foreground: 0 0% 100%;
-  --destructive: 0 72% 42%;
-  --destructive-foreground: 0 72% 98%;
-  --secondary: 40 15% 30%;
-  --secondary-foreground: 40 25% 95%;
-  --muted: 210 15% 25%;
-  --muted-foreground: 40 15% 65%;
-  --accent: 40 15% 28%;
-  --accent-foreground: 40 25% 95%;
-  --input: 210 15% 28%;
-  --ring: 205 20% 55%;
-  --chart-1: 205 20% 65%;
-  --chart-2: 40 25% 60%;
-  --chart-3: 35 30% 60%;
-  --chart-4: 210 15% 60%;
-  --chart-5: 195 25% 62%;
+  --destructive: 0 65% 50%;
+  --destructive-foreground: 0 0% 100%;
+  --secondary: 205 18% 22%;
+  --secondary-foreground: 200 15% 92%;
+  --muted: 205 15% 20%;
+  --muted-foreground: 200 12% 60%;
+  --accent: 205 18% 22%;
+  --accent-foreground: 200 15% 92%;
+  --input: 205 18% 22%;
+  --ring: 200 40% 55%;
+  --chart-1: 200 40% 55%;
+  --chart-2: 195 30% 55%;
+  --chart-3: 185 25% 50%;
+  --chart-4: 205 25% 52%;
+  --chart-5: 190 32% 52%;
   --shadow-2xs: 0px 2px 0px 0px hsl(210 6% 92% / 0);
   --shadow-xs: 0px 2px 0px 0px hsl(210 6% 92% / 0);
   --shadow-sm: 0px 2px 0px 0px hsl(210 6% 92% / 0), 0px 1px 2px -1px hsl(210 6% 92% / 0);
@@ -254,8 +254,8 @@
 
   .coastal-shadow {
     box-shadow:
-      0 1px 2px rgba(0, 0, 0, 0.03),
-      0 4px 16px rgba(168, 188, 201, 0.18);
+      0 1px 3px rgba(0, 0, 0, 0.02),
+      0 4px 20px rgba(120, 160, 180, 0.12);
   }
 
   .soft-shadow {
