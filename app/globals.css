@@ -9,12 +9,12 @@
   --opaque-button-border-intensity: -8;
   --elevate-1: rgba(0, 0, 0, 0.03);
   --elevate-2: rgba(0, 0, 0, 0.08);
-  --background: 40 25% 98%;
+  --background: 40 20% 97%;
   --foreground: 210 20% 20%;
-  --border: 40 15% 88%;
-  --card: 40 30% 96%;
+  --border: 40 15% 85%;
+  --card: 0 0% 100%;
   --card-foreground: 210 20% 20%;
-  --card-border: 40 15% 90%;
+  --card-border: 40 15% 88%;
   --sidebar: 40 25% 95%;
   --sidebar-foreground: 210 20% 20%;
   --sidebar-border: 40 15% 88%;
@@ -28,11 +28,11 @@
   --popover-border: 40 15% 88%;
   --primary: 205 20% 65%;
   --primary-foreground: 0 0% 100%;
-  --secondary: 40 25% 85%;
+  --secondary: 40 30% 94%;
   --secondary-foreground: 210 20% 20%;
-  --muted: 40 20% 92%;
-  --muted-foreground: 210 15% 45%;
-  --accent: 40 20% 82%;
+  --muted: 40 25% 90%;
+  --muted-foreground: 210 15% 40%;
+  --accent: 205 15% 88%;
   --accent-foreground: 210 20% 20%;
   --destructive: 0 72% 42%;
   --destructive-foreground: 0 72% 98%;
@@ -253,7 +253,9 @@
   }
 
   .coastal-shadow {
-    box-shadow: 0 4px 20px rgba(168, 188, 201, 0.15);
+    box-shadow:
+      0 1px 3px rgba(0, 0, 0, 0.04),
+      0 4px 20px rgba(168, 188, 201, 0.12);
   }
 
   .soft-shadow {
