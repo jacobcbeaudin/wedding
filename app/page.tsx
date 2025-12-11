@@ -35,10 +35,10 @@ export default function Home() {
 
         <section className="container mx-auto max-w-4xl px-6 py-12 sm:py-20">
           <div className="mb-12 text-center sm:mb-16">
-            <h2 className="elegant-serif mb-6 text-3xl font-light text-foreground sm:text-4xl md:text-5xl">
+            <h2 className="elegant-serif text-foreground mb-6 text-3xl font-light sm:text-4xl md:text-5xl">
               Join Us in Celebrating Our Love
             </h2>
-            <p className="mx-auto max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg">
+            <p className="text-muted-foreground mx-auto max-w-2xl text-base leading-relaxed sm:text-lg">
               We are thrilled to invite you to share in the joy of our wedding weekend. Your
               presence would mean the world to us as we begin this beautiful journey together.
             </p>
@@ -63,10 +63,10 @@ export default function Home() {
                   className="h-20 w-20 sm:h-28 sm:w-28"
                 />
               </div>
-              <h3 className="elegant-serif mb-2 text-xl text-primary sm:text-2xl">Tea Ceremony</h3>
-              <p className="mb-2 text-sm text-muted-foreground sm:text-base">September 11, 2026</p>
+              <h3 className="elegant-serif text-primary mb-2 text-xl sm:text-2xl">Tea Ceremony</h3>
+              <p className="text-muted-foreground mb-2 text-sm sm:text-base">September 11, 2026</p>
               <p className="mb-2 text-xs sm:text-sm">2:00 PM</p>
-              <p className="text-xs italic text-muted-foreground">Immediate family only</p>
+              <p className="text-muted-foreground text-xs italic">Immediate family only</p>
             </Card>
 
             <Card className="coastal-shadow border-0 p-6 text-center sm:p-8">
@@ -79,8 +79,8 @@ export default function Home() {
                   className="h-20 w-20 sm:h-28 sm:w-28"
                 />
               </div>
-              <h3 className="elegant-serif mb-2 text-xl text-primary sm:text-2xl">Welcome Party</h3>
-              <p className="mb-2 text-sm text-muted-foreground sm:text-base">September 11, 2026</p>
+              <h3 className="elegant-serif text-primary mb-2 text-xl sm:text-2xl">Welcome Party</h3>
+              <p className="text-muted-foreground mb-2 text-sm sm:text-base">September 11, 2026</p>
               <p className="text-xs sm:text-sm">7:00 PM</p>
             </Card>
 
@@ -94,15 +94,15 @@ export default function Home() {
                   className="h-20 w-20 sm:h-28 sm:w-28"
                 />
               </div>
-              <h3 className="elegant-serif mb-2 text-xl text-primary sm:text-2xl">
+              <h3 className="elegant-serif text-primary mb-2 text-xl sm:text-2xl">
                 Wedding Ceremony
               </h3>
-              <p className="mb-2 text-sm text-muted-foreground sm:text-base">September 12, 2026</p>
+              <p className="text-muted-foreground mb-2 text-sm sm:text-base">September 12, 2026</p>
               <p className="text-xs sm:text-sm">4:00 PM</p>
             </Card>
           </div>
 
-          <div className="space-y-4 text-center sm:space-y-6">
+          <div className="flex flex-col items-center gap-6 text-center">
             <Link href="/rsvp">
               <Button
                 size="lg"

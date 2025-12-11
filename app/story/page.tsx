@@ -10,10 +10,10 @@ export default function OurStory() {
     <CoastalLayout>
       <div className="container mx-auto max-w-5xl px-6 py-12 sm:py-20">
         <div className="mb-12 text-center sm:mb-16">
-          <h1 className="elegant-serif mb-6 text-4xl font-light text-foreground sm:text-5xl md:text-6xl">
+          <h1 className="elegant-serif text-foreground mb-6 text-4xl font-light sm:text-5xl md:text-6xl">
             Our Story
           </h1>
-          <p className="text-base text-muted-foreground sm:text-lg">How two hearts became one</p>
+          <p className="text-muted-foreground text-base sm:text-lg">How two hearts became one</p>
         </div>
 
         <SectionDivider />
@@ -30,15 +30,15 @@ export default function OurStory() {
             />
           </div>
           <div>
-            <h2 className="elegant-serif mb-4 text-2xl text-primary sm:mb-6 sm:text-3xl md:text-4xl">
+            <h2 className="elegant-serif text-primary mb-4 text-2xl sm:mb-6 sm:text-3xl md:text-4xl">
               How We Met
             </h2>
-            <p className="mb-4 text-base leading-relaxed text-foreground sm:text-lg">
+            <p className="text-foreground mb-4 text-base leading-relaxed sm:text-lg">
               Our love story began in a charming coffee shop in downtown San Francisco during the
               fall of 2020. Caroline was struggling with her laptop, and Jake, being the tech-savvy
               gentleman he is, offered to help.
             </p>
-            <p className="text-base leading-relaxed text-foreground sm:text-lg">
+            <p className="text-foreground text-base leading-relaxed sm:text-lg">
               What started as a simple act of kindness turned into a three-hour conversation about
               everything from their favorite movies to their dreams for the future. They discovered
               they both loved hiking, had an inexplicable fondness for terrible puns, and shared a
@@ -49,15 +49,15 @@ export default function OurStory() {
 
         <div className="mb-12 grid items-center gap-8 sm:mb-20 sm:gap-12 md:grid-cols-2">
           <div className="order-2 md:order-1">
-            <h2 className="elegant-serif mb-4 text-2xl text-primary sm:mb-6 sm:text-3xl md:text-4xl">
+            <h2 className="elegant-serif text-primary mb-4 text-2xl sm:mb-6 sm:text-3xl md:text-4xl">
               The Proposal
             </h2>
-            <p className="mb-4 text-base leading-relaxed text-foreground sm:text-lg">
+            <p className="text-foreground mb-4 text-base leading-relaxed sm:text-lg">
               On a beautiful spring evening in 2025, Jake planned a surprise trip to Big Sur. He
               told Caroline they were just going for a weekend hike, but he had something much more
               special in mind.
             </p>
-            <p className="text-base leading-relaxed text-foreground sm:text-lg">
+            <p className="text-foreground text-base leading-relaxed sm:text-lg">
               As they reached the top of their favorite trail at sunset, overlooking the Pacific
               Ocean, Jake got down on one knee. &quot;Caroline, you make every day an adventure.
               Will you make me the happiest person alive and marry me?&quot; Through happy tears,
@@ -79,10 +79,10 @@ export default function OurStory() {
 
         <div className="mb-12 grid gap-6 sm:gap-8 md:grid-cols-2">
           <Card className="coastal-shadow border-0 p-6 sm:p-8">
-            <h3 className="elegant-serif mb-4 text-xl text-primary sm:mb-6 sm:text-2xl">
+            <h3 className="elegant-serif text-primary mb-4 text-xl sm:mb-6 sm:text-2xl">
               About Jake
             </h3>
-            <ul className="space-y-2 text-sm text-foreground sm:space-y-3 sm:text-base">
+            <ul className="text-foreground space-y-2 text-sm sm:space-y-3 sm:text-base">
               <li className="flex gap-3">
                 <span className="text-primary">&bull;</span>
                 <span>Loves playing guitar and discovering craft breweries</span>
@@ -107,10 +107,10 @@ export default function OurStory() {
           </Card>
 
           <Card className="coastal-shadow border-0 p-6 sm:p-8">
-            <h3 className="elegant-serif mb-4 text-xl text-primary sm:mb-6 sm:text-2xl">
+            <h3 className="elegant-serif text-primary mb-4 text-xl sm:mb-6 sm:text-2xl">
               About Caroline
             </h3>
-            <ul className="space-y-2 text-sm text-foreground sm:space-y-3 sm:text-base">
+            <ul className="text-foreground space-y-2 text-sm sm:space-y-3 sm:text-base">
               <li className="flex gap-3">
                 <span className="text-primary">&bull;</span>
                 <span>Passionate about reading, yoga, and baking sourdough</span>
@@ -136,10 +136,10 @@ export default function OurStory() {
         </div>
 
         <Card className="coastal-shadow border-0 p-6 sm:p-8">
-          <h3 className="elegant-serif mb-4 text-center text-xl text-primary sm:mb-6 sm:text-2xl">
+          <h3 className="elegant-serif text-primary mb-4 text-center text-xl sm:mb-6 sm:text-2xl">
             Fun Facts About Us
           </h3>
-          <div className="grid gap-3 text-sm text-foreground sm:gap-4 sm:text-base md:grid-cols-2">
+          <div className="text-foreground grid gap-3 text-sm sm:gap-4 sm:text-base md:grid-cols-2">
             <div className="flex gap-3">
               <span className="text-primary">&bull;</span>
               <span>We bonded over Mario Kart (Caroline always wins)</span>
@@ -164,7 +164,7 @@ export default function OurStory() {
         </Card>
 
         <div className="mt-12 text-center sm:mt-16">
-          <p className="elegant-serif text-xl text-foreground sm:text-2xl">
+          <p className="elegant-serif text-foreground text-xl sm:text-2xl">
             We can&apos;t wait to celebrate with you
           </p>
         </div>

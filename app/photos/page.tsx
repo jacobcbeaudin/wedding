@@ -22,10 +22,10 @@ export default function Photos() {
     <CoastalLayout>
       <div className="container mx-auto max-w-6xl px-6 py-12 sm:py-20">
         <div className="mb-12 text-center sm:mb-16">
-          <h1 className="elegant-serif mb-6 text-4xl font-light text-foreground sm:text-5xl md:text-6xl">
+          <h1 className="elegant-serif text-foreground mb-6 text-4xl font-light sm:text-5xl md:text-6xl">
             Our Gallery
           </h1>
-          <p className="text-base text-muted-foreground sm:text-lg">
+          <p className="text-muted-foreground text-base sm:text-lg">
             Moments we&apos;ve shared together
           </p>
         </div>
@@ -73,10 +73,10 @@ export default function Photos() {
         />
 
         <div className="text-center">
-          <p className="elegant-serif mb-2 text-xl text-foreground sm:text-2xl">
+          <p className="elegant-serif text-foreground mb-2 text-xl sm:text-2xl">
             More memories to come
           </p>
-          <p className="text-sm text-muted-foreground sm:text-base">
+          <p className="text-muted-foreground text-sm sm:text-base">
             Check back after the wedding for photos from our celebration
           </p>
         </div>

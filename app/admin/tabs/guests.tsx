@@ -128,7 +128,7 @@ export function GuestsTab({ adminToken }: GuestsTabProps) {
   });
 
   if (isLoading) {
-    return <div className="py-8 text-center text-muted-foreground">Loading...</div>;
+    return <div className="text-muted-foreground py-8 text-center">Loading...</div>;
   }
 
   return (

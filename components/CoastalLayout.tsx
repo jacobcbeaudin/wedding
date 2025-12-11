@@ -11,7 +11,7 @@ interface CoastalLayoutProps {
 export default function CoastalLayout({ children }: CoastalLayoutProps) {
   return (
     <PasswordProtection>
-      <div className="min-h-screen bg-background">
+      <div className="bg-background min-h-screen">
         <Navigation />
         {children}
       </div>

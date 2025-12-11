@@ -149,7 +149,7 @@ export function RsvpsTab({ adminToken }: RsvpsTabProps) {
 
   const SortableHeader = ({ field, children }: { field: SortField; children: React.ReactNode }) => (
     <TableHead
-      className="cursor-pointer select-none hover:bg-muted/50"
+      className="hover:bg-muted/50 cursor-pointer select-none"
       onClick={() => handleSort(field)}
     >
       <span className="flex items-center gap-1">
@@ -162,7 +162,7 @@ export function RsvpsTab({ adminToken }: RsvpsTabProps) {
   );
 
   if (isLoading) {
-    return <div className="py-8 text-center text-muted-foreground">Loading...</div>;
+    return <div className="text-muted-foreground py-8 text-center">Loading...</div>;
   }
 
   return (
@@ -200,7 +200,7 @@ export function RsvpsTab({ adminToken }: RsvpsTabProps) {
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value as typeof statusFilter)}
-              className="rounded-md border bg-background px-3 py-2 text-sm"
+              className="bg-background rounded-md border px-3 py-2 text-sm"
             >
               <option value="all">All Status</option>
               <option value="attending">Attending</option>
@@ -210,7 +210,7 @@ export function RsvpsTab({ adminToken }: RsvpsTabProps) {
             <select
               value={eventFilter}
               onChange={(e) => setEventFilter(e.target.value)}
-              className="rounded-md border bg-background px-3 py-2 text-sm"
+              className="bg-background rounded-md border px-3 py-2 text-sm"
             >
               <option value="all">All Events</option>
               {events?.map((event) => (
@@ -255,14 +255,14 @@ export function RsvpsTab({ adminToken }: RsvpsTabProps) {
                       <span className="text-muted-foreground">None</span>
                     )}
                   </TableCell>
-                  <TableCell className="text-sm text-muted-foreground">
+                  <TableCell className="text-muted-foreground text-sm">
                     {new Date(rsvp.updatedAt).toLocaleDateString()}
                   </TableCell>
                 </TableRow>
               ))}
               {filteredAndSortedRsvps.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={7} className="py-8 text-center text-muted-foreground">
+                  <TableCell colSpan={7} className="text-muted-foreground py-8 text-center">
                     No RSVPs found
                   </TableCell>
                 </TableRow>

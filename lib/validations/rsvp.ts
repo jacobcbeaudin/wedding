@@ -15,15 +15,15 @@ import { MAX_SONG_REQUESTS, MAX_NOTES_LENGTH } from '@/lib/config/rsvp';
  * Schema for looking up a guest by name.
  */
 export const lookupGuestSchema = z.object({
-  firstName: z.string().min(1, 'First name is required').trim(),
-  lastName: z.string().min(1, 'Last name is required').trim(),
+  firstName: z.string({ error: 'First name is required' }).min(1).trim(),
+  lastName: z.string({ error: 'Last name is required' }).min(1).trim(),
 });
 
 /**
  * Schema for fetching a party by ID.
  */
 export const getPartySchema = z.object({
-  partyId: z.string().uuid('Invalid party ID'),
+  partyId: z.uuid({ error: 'Invalid party ID' }),
 });
 
 /**
@@ -31,8 +31,8 @@ export const getPartySchema = z.object({
  * mealChoice is required for wedding event when attending (validated at API layer).
  */
 export const rsvpResponseSchema = z.object({
-  guestId: z.string().uuid('Invalid guest ID'),
-  eventId: z.string().uuid('Invalid event ID'),
+  guestId: z.uuid({ error: 'Invalid guest ID' }),
+  eventId: z.uuid({ error: 'Invalid event ID' }),
   status: z.enum(['attending', 'declined']),
   mealChoice: z.enum(MEAL_OPTIONS).nullable().optional(),
 });
@@ -41,7 +41,7 @@ export const rsvpResponseSchema = z.object({
  * Schema for dietary restriction update.
  */
 export const dietaryUpdateSchema = z.object({
-  guestId: z.string().uuid('Invalid guest ID'),
+  guestId: z.uuid({ error: 'Invalid guest ID' }),
   dietaryRestrictions: z.string().max(500).nullable(),
 });
 
@@ -49,7 +49,7 @@ export const dietaryUpdateSchema = z.object({
  * Schema for a song request (party-level).
  */
 export const songRequestSchema = z.object({
-  song: z.string().min(1, 'Song name is required').max(200),
+  song: z.string({ error: 'Song name is required' }).min(1).max(200),
   artist: z.string().max(200).nullable().optional(),
 });
 
@@ -57,12 +57,12 @@ export const songRequestSchema = z.object({
  * Schema for submitting RSVPs for a party.
  */
 export const submitRsvpSchema = z.object({
-  partyId: z.string().uuid('Invalid party ID'),
-  rsvps: z.array(rsvpResponseSchema).min(1, 'At least one RSVP is required'),
+  partyId: z.uuid({ error: 'Invalid party ID' }),
+  rsvps: z.array(rsvpResponseSchema).min(1, { error: 'At least one RSVP is required' }),
   dietaryUpdates: z.array(dietaryUpdateSchema).optional().default([]),
   songRequests: z
     .array(songRequestSchema)
-    .max(MAX_SONG_REQUESTS, `Maximum ${MAX_SONG_REQUESTS} song requests allowed`)
+    .max(MAX_SONG_REQUESTS, { error: `Maximum ${MAX_SONG_REQUESTS} song requests allowed` })
     .optional()
     .default([]),
   notes: z.string().max(MAX_NOTES_LENGTH).nullable().optional(),

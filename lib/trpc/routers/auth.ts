@@ -18,7 +18,7 @@ const ratelimit = process.env.UPSTASH_REDIS_REST_URL
 
 export const authRouter = router({
   verify: publicProcedure
-    .input(z.object({ password: z.string().min(1) }))
+    .input(z.object({ password: z.string().min(1, { error: 'Password is required' }) }))
     .mutation(async ({ input, ctx }) => {
       if (ratelimit) {
         const { success } = await ratelimit.limit(ctx.ip);

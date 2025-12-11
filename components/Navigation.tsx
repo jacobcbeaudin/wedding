@@ -33,7 +33,7 @@ function NavLink({
       href={item.path}
       onClick={onClick}
       className={`text-sm tracking-wide transition-colors ${
-        isActive ? 'font-medium text-primary' : 'text-foreground hover:text-primary'
+        isActive ? 'text-primary font-medium' : 'text-foreground hover:text-primary'
       }`}
       data-testid={`nav-${item.label.toLowerCase().replace(/\s+/g, '-')}`}
     >
@@ -50,13 +50,13 @@ export default function Navigation() {
   const desktopNavItems = navItems.filter((item) => item.path !== '/');
 
   return (
-    <nav className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-md">
+    <nav className="border-border bg-background/80 sticky top-0 z-50 border-b backdrop-blur-md">
       <div className="container mx-auto px-6 py-5">
         <div className="flex items-center justify-between">
           {/* Logo - links to home */}
           <Link
             href="/"
-            className="elegant-serif text-xl tracking-wide text-primary transition-opacity hover:opacity-80"
+            className="elegant-serif text-primary text-xl tracking-wide transition-opacity hover:opacity-80"
           >
             C & J
           </Link>
@@ -82,7 +82,7 @@ export default function Navigation() {
             </SheetTrigger>
             <SheetContent side="right" className="w-[300px]">
               <SheetHeader>
-                <SheetTitle className="elegant-serif text-2xl text-primary">
+                <SheetTitle className="elegant-serif text-primary text-2xl">
                   Caroline & Jake
                 </SheetTitle>
               </SheetHeader>
