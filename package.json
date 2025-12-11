@@ -8,7 +8,7 @@
     "build": "next build",
     "start": "next start",
     "check": "tsc",
-    "lint": "next lint",
+    "lint": "eslint .",
     "db:push": "drizzle-kit push",
     "db:seed": "npx tsx scripts/seed.ts",
     "db:seed:csv": "npx tsx scripts/seed-from-csv.ts",

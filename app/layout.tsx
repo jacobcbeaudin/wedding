@@ -1,8 +1,24 @@
 import type { Metadata, Viewport } from 'next';
+import { Forum, Great_Vibes } from 'next/font/google';
 import { TRPCProvider } from '@/components/providers/trpc-provider';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { Toaster } from '@/components/ui/toaster';
 import './globals.css';
+
+// Optimized font loading - self-hosted, no layout shift
+const forum = Forum({
+  weight: '400',
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-forum',
+});
+
+const greatVibes = Great_Vibes({
+  weight: '400',
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-great-vibes',
+});
 
 export const metadata: Metadata = {
   title: "Caroline & Jake's Wedding - September 12, 2026",
@@ -26,15 +42,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Forum&family=Great+Vibes&display=swap"
-          rel="stylesheet"
-        />
-      </head>
+    <html lang="en" className={`${forum.variable} ${greatVibes.variable}`}>
       <body>
         <TRPCProvider>
           <TooltipProvider>

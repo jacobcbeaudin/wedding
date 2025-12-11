@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import CoastalLayout from '@/components/CoastalLayout';
 import SectionDivider from '@/components/SectionDivider';
 import { Card } from '@/components/ui/card';
@@ -18,11 +19,14 @@ export default function OurStory() {
         <SectionDivider />
 
         <div className="mb-12 grid items-center gap-8 sm:mb-20 sm:gap-12 md:grid-cols-2">
-          <div>
-            <img
+          <div className="relative aspect-[4/3] overflow-hidden rounded-lg">
+            <Image
               src="/images/photo-02.webp"
               alt="Jake and Caroline"
-              className="coastal-shadow w-full rounded-lg"
+              fill
+              className="coastal-shadow object-cover"
+              sizes="(max-width: 768px) 100vw, 50vw"
+              priority
             />
           </div>
           <div>
@@ -60,11 +64,13 @@ export default function OurStory() {
               Caroline said YES!
             </p>
           </div>
-          <div className="order-1 md:order-2">
-            <img
+          <div className="relative order-1 aspect-[4/3] overflow-hidden rounded-lg md:order-2">
+            <Image
               src="/images/photo-03.webp"
               alt="The proposal"
-              className="coastal-shadow w-full rounded-lg"
+              fill
+              className="coastal-shadow object-cover"
+              sizes="(max-width: 768px) 100vw, 50vw"
             />
           </div>
         </div>

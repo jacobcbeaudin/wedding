@@ -26,6 +26,8 @@ export default tseslint.config(
       ...nextPlugin.configs.recommended.rules,
       ...nextPlugin.configs['core-web-vitals'].rules,
       '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+      // Disable false positive - this rule is for Pages Router, not App Router
+      '@next/next/no-page-custom-font': 'off',
     },
   }
 );
