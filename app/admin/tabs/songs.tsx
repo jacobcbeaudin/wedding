@@ -57,7 +57,7 @@ export function SongsTab({ adminToken }: SongsTabProps) {
   };
 
   if (isLoading) {
-    return <div className="py-8 text-center text-muted-foreground">Loading...</div>;
+    return <div className="text-muted-foreground py-8 text-center">Loading...</div>;
   }
 
   return (
@@ -88,7 +88,7 @@ export function SongsTab({ adminToken }: SongsTabProps) {
                   {song.artist || <span className="text-muted-foreground">-</span>}
                 </TableCell>
                 <TableCell>{song.party.name}</TableCell>
-                <TableCell className="text-sm text-muted-foreground">
+                <TableCell className="text-muted-foreground text-sm">
                   {new Date(song.createdAt).toLocaleDateString()}
                 </TableCell>
                 <TableCell>
@@ -105,7 +105,7 @@ export function SongsTab({ adminToken }: SongsTabProps) {
             ))}
             {songs?.length === 0 && (
               <TableRow>
-                <TableCell colSpan={5} className="py-8 text-center text-muted-foreground">
+                <TableCell colSpan={5} className="text-muted-foreground py-8 text-center">
                   No song requests yet
                 </TableCell>
               </TableRow>

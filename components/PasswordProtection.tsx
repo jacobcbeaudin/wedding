@@ -60,16 +60,16 @@ export default function PasswordProtection({ children }: PasswordProtectionProps
         backgroundPosition: 'center',
       }}
     >
-      <Card className="coastal-shadow w-full max-w-md border-0 bg-background/95 p-10 text-center backdrop-blur-sm">
+      <Card className="coastal-shadow bg-background/95 w-full max-w-md border-0 p-10 text-center backdrop-blur-sm">
         <div className="mb-8">
-          <h1 className="elegant-serif mb-4 text-5xl tracking-wide text-primary">
+          <h1 className="elegant-serif text-primary mb-4 text-5xl tracking-wide">
             Caroline & Jake
           </h1>
         </div>
 
         <div className="mb-8">
-          <p className="mb-2 text-foreground">Welcome to our wedding website!</p>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-foreground mb-2">Welcome to our wedding website!</p>
+          <p className="text-muted-foreground text-sm">
             Please enter the password from your invitation to continue.
           </p>
         </div>
@@ -86,7 +86,7 @@ export default function PasswordProtection({ children }: PasswordProtectionProps
               data-testid="input-password"
             />
             {error && (
-              <p className="mt-2 text-sm text-destructive" data-testid="text-password-error">
+              <p className="text-destructive mt-2 text-sm" data-testid="text-password-error">
                 {error}
               </p>
             )}
