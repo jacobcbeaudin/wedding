@@ -65,8 +65,15 @@ export default function AdminPage() {
   // Login screen
   if (!adminToken) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-muted/30 p-4">
-        <Card className="w-full max-w-md border-0 p-8 shadow-lg">
+      <div
+        className="flex min-h-screen items-center justify-center p-4"
+        style={{
+          backgroundImage: `url(/images/photo-06.webp)`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+        }}
+      >
+        <Card className="w-full max-w-md border-0 bg-background/95 p-8 shadow-lg backdrop-blur-sm">
           <div className="mb-6 flex flex-col items-center">
             <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
               <Lock className="h-6 w-6 text-primary" />
