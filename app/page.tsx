@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import CoastalLayout from '@/components/CoastalLayout';
 import CountdownTimer from '@/components/CountdownTimer';
 import SectionDivider from '@/components/SectionDivider';
@@ -53,7 +54,15 @@ export default function Home() {
 
           <div className="mb-12 grid gap-4 sm:mb-16 sm:gap-6 md:grid-cols-3">
             <Card className="coastal-shadow border-0 p-6 text-center sm:p-8">
-              <div className="mb-4 text-3xl sm:text-4xl">&#129511;</div>
+              <div className="mb-4 flex justify-center">
+                <Image
+                  src="/images/icons/tea-ceremony.png"
+                  alt="Tea ceremony"
+                  width={112}
+                  height={112}
+                  className="h-20 w-20 sm:h-28 sm:w-28"
+                />
+              </div>
               <h3 className="elegant-serif mb-2 text-xl text-primary sm:text-2xl">Tea Ceremony</h3>
               <p className="mb-2 text-sm text-muted-foreground sm:text-base">September 11, 2026</p>
               <p className="mb-2 text-xs sm:text-sm">2:00 PM</p>
@@ -61,14 +70,30 @@ export default function Home() {
             </Card>
 
             <Card className="coastal-shadow border-0 p-6 text-center sm:p-8">
-              <div className="mb-4 text-3xl sm:text-4xl">&#129346;</div>
+              <div className="mb-4 flex justify-center">
+                <Image
+                  src="/images/icons/welcome-party.png"
+                  alt="Welcome party"
+                  width={112}
+                  height={112}
+                  className="h-20 w-20 sm:h-28 sm:w-28"
+                />
+              </div>
               <h3 className="elegant-serif mb-2 text-xl text-primary sm:text-2xl">Welcome Party</h3>
               <p className="mb-2 text-sm text-muted-foreground sm:text-base">September 11, 2026</p>
               <p className="text-xs sm:text-sm">7:00 PM</p>
             </Card>
 
             <Card className="coastal-shadow border-0 p-6 text-center sm:p-8">
-              <div className="mb-4 text-3xl sm:text-4xl">&#128210;</div>
+              <div className="mb-4 flex justify-center">
+                <Image
+                  src="/images/icons/wedding.png"
+                  alt="Wedding"
+                  width={112}
+                  height={112}
+                  className="h-20 w-20 sm:h-28 sm:w-28"
+                />
+              </div>
               <h3 className="elegant-serif mb-2 text-xl text-primary sm:text-2xl">
                 Wedding Ceremony
               </h3>
