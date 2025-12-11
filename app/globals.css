@@ -12,7 +12,7 @@
   --background: 40 20% 97%;
   --foreground: 210 20% 20%;
   --border: 40 15% 85%;
-  --card: 0 0% 100%;
+  --card: 40 20% 97%;
   --card-foreground: 210 20% 20%;
   --card-border: 40 15% 88%;
   --sidebar: 40 25% 95%;
@@ -254,8 +254,8 @@
 
   .coastal-shadow {
     box-shadow:
-      0 1px 3px rgba(0, 0, 0, 0.04),
-      0 4px 20px rgba(168, 188, 201, 0.12);
+      0 1px 2px rgba(0, 0, 0, 0.03),
+      0 4px 16px rgba(168, 188, 201, 0.18);
   }
 
   .soft-shadow {

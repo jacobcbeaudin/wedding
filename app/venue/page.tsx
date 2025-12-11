@@ -51,65 +51,68 @@ export default function Venue() {
           </div>
         </Card>
 
-        <Card className="coastal-shadow mb-8 border-0 p-6 sm:mb-12 sm:p-8">
-          <div className="flex items-start gap-4">
-            <Hotel className="mt-1 h-5 w-5 flex-shrink-0 text-primary sm:h-6 sm:w-6" />
-            <div className="flex-1">
-              <h2 className="elegant-serif mb-6 text-2xl text-primary sm:text-3xl">
-                Where to Stay
-              </h2>
+        <div className="mb-8 sm:mb-12">
+          <div className="mb-6 flex items-center justify-center gap-3 sm:mb-8">
+            <Hotel className="h-5 w-5 text-primary sm:h-6 sm:w-6" />
+            <h2 className="elegant-serif text-2xl text-primary sm:text-3xl">Where to Stay</h2>
+          </div>
 
-              <div className="mb-6 rounded-lg bg-secondary/20 p-4 sm:mb-8 sm:p-6">
-                <h3 className="mb-4 text-lg font-medium text-foreground sm:text-xl">
-                  Hyatt Carmel Highlands
-                </h3>
-                <div className="space-y-2 text-sm text-foreground sm:text-base">
-                  <p>
-                    <span className="font-medium">Room Block Rate:</span> $199/night
-                  </p>
-                  <p>
-                    <span className="font-medium">Booking Code:</span> BEAUDINZHANG2026
-                  </p>
-                  <p>
-                    <span className="font-medium">Reservations:</span> (831) 555-0123
-                  </p>
-                  <p>
-                    <span className="font-medium">Deadline:</span> August 12, 2026
-                  </p>
-                </div>
-                <p className="mt-4 text-xs text-muted-foreground sm:text-sm">
-                  We have a special room block at our venue hotel! This is the most convenient
-                  option as you&apos;ll be steps away from all events. The block includes
-                  complimentary breakfast and parking.
+          <div className="grid gap-6 sm:gap-8 md:grid-cols-3">
+            <Card className="coastal-shadow border-0 p-6 sm:p-8">
+              <h3 className="elegant-serif mb-2 text-lg text-primary sm:text-xl">
+                Hyatt Carmel Highlands
+              </h3>
+              <p className="mb-4 text-xs font-medium text-primary/80 sm:text-sm">Wedding Venue</p>
+              <p className="mb-4 text-sm text-muted-foreground">
+                Steps away from all wedding events. Stunning ocean views and complimentary parking.
+              </p>
+              <div className="space-y-1 text-sm text-foreground">
+                <p>
+                  <span className="text-muted-foreground">From</span> $199/night
+                </p>
+                <p className="text-xs text-muted-foreground">Code: BEAUDINZHANG2026</p>
+              </div>
+            </Card>
+
+            <Card className="coastal-shadow border-0 p-6 sm:p-8">
+              <h3 className="elegant-serif mb-2 text-lg text-primary sm:text-xl">
+                Monterey Plaza Hotel
+              </h3>
+              <p className="mb-4 text-xs font-medium text-muted-foreground sm:text-sm">
+                15 minutes from venue
+              </p>
+              <p className="mb-4 text-sm text-muted-foreground">
+                Oceanfront luxury on Cannery Row with spa, rooftop dining, and private beach access.
+              </p>
+              <div className="space-y-1 text-sm text-foreground">
+                <p>
+                  <span className="text-muted-foreground">From</span> $350/night
                 </p>
               </div>
+            </Card>
 
-              <h4 className="mb-4 text-sm font-medium text-foreground sm:text-base">
-                Alternative Accommodations
-              </h4>
-              <ul className="space-y-2 text-sm text-foreground sm:text-base">
-                <li className="flex gap-2">
-                  <span className="text-primary">&bull;</span>
-                  <span>
-                    <strong>La Playa Carmel</strong> - Boutique beachfront hotel, 2 miles away
-                  </span>
-                </li>
-                <li className="flex gap-2">
-                  <span className="text-primary">&bull;</span>
-                  <span>
-                    <strong>Carmel Mission Inn</strong> - Budget-friendly option, 3 miles away
-                  </span>
-                </li>
-                <li className="flex gap-2">
-                  <span className="text-primary">&bull;</span>
-                  <span>
-                    <strong>Airbnb/VRBO</strong> - Many charming options in downtown Carmel
-                  </span>
-                </li>
-              </ul>
-            </div>
+            <Card className="coastal-shadow border-0 p-6 sm:p-8">
+              <h3 className="elegant-serif mb-2 text-lg text-primary sm:text-xl">
+                La Playa Carmel
+              </h3>
+              <p className="mb-4 text-xs font-medium text-muted-foreground sm:text-sm">
+                10 minutes from venue
+              </p>
+              <p className="mb-4 text-sm text-muted-foreground">
+                Historic boutique hotel in the heart of Carmel-by-the-Sea with lush gardens.
+              </p>
+              <div className="space-y-1 text-sm text-foreground">
+                <p>
+                  <span className="text-muted-foreground">From</span> $275/night
+                </p>
+              </div>
+            </Card>
           </div>
-        </Card>
+
+          <p className="mt-6 text-center text-xs text-muted-foreground sm:mt-8 sm:text-sm">
+            Book by August 12, 2026 for best rates. Additional options available on Airbnb and VRBO.
+          </p>
+        </div>
 
         <div className="grid gap-6 sm:gap-8 md:grid-cols-2">
           <Card className="coastal-shadow border-0 p-6 sm:p-8">
