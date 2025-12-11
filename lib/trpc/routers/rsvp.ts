@@ -3,7 +3,7 @@
  * Relational model: parties → guests → rsvps, with events and invitations.
  */
 
-import { eq, and, asc, inArray } from 'drizzle-orm';
+import { eq, and, asc, inArray, sql } from 'drizzle-orm';
 import { router, publicProcedure, TRPCError } from '../init';
 import {
   db,
@@ -163,11 +163,20 @@ export const rsvpRouter = router({
       });
     }
 
-    // Find the guest
+    // Find the guest using case-insensitive, accent-insensitive comparison
+    // - lower() handles case: "John" matches "john"
+    // - unaccent() handles accents: "José" matches "jose"
+    // - This handles O'Brien, Mary-Jane, José, etc.
+    // Requires: CREATE EXTENSION IF NOT EXISTS unaccent; (enabled on dev & prod)
     const [guest] = await db
       .select()
       .from(guests)
-      .where(and(eq(guests.firstName, firstName), eq(guests.lastName, lastName)))
+      .where(
+        and(
+          sql`lower(unaccent(${guests.firstName})) = ${firstName}`,
+          sql`lower(unaccent(${guests.lastName})) = ${lastName}`
+        )
+      )
       .limit(1);
 
     if (!guest) {
