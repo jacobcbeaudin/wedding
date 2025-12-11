@@ -1,9 +1,11 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 import CoastalLayout from '@/components/CoastalLayout';
 import SectionDivider from '@/components/SectionDivider';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
+import Lightbox from 'yet-another-react-lightbox';
+import 'yet-another-react-lightbox/styles.css';
 
 const photos = [
   { src: '/images/photo-01.webp', alt: 'Photo 1' },
@@ -14,7 +16,7 @@ const photos = [
 ];
 
 export default function Photos() {
-  const [selectedPhoto, setSelectedPhoto] = useState<number | null>(null);
+  const [index, setIndex] = useState(-1);
 
   return (
     <CoastalLayout>
@@ -31,33 +33,44 @@ export default function Photos() {
         <SectionDivider />
 
         <div className="mb-12 grid grid-cols-1 gap-4 sm:mb-16 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
-          {photos.map((photo, index) => (
+          {photos.map((photo, i) => (
             <div
-              key={index}
-              className="coastal-shadow hover-elevate group cursor-pointer overflow-hidden rounded-lg"
-              onClick={() => setSelectedPhoto(index)}
-              data-testid={`photo-${index}`}
+              key={i}
+              className="coastal-shadow hover-elevate group relative aspect-[4/3] cursor-pointer overflow-hidden rounded-lg"
+              onClick={() => setIndex(i)}
+              data-testid={`photo-${i}`}
             >
-              <img
+              <Image
                 src={photo.src}
                 alt={photo.alt}
-                className="h-64 w-full object-cover transition-transform duration-300 group-hover:scale-105 sm:h-80"
+                fill
+                className="object-cover transition-transform duration-300 group-hover:scale-105"
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
               />
             </div>
           ))}
         </div>
 
-        <Dialog open={selectedPhoto !== null} onOpenChange={() => setSelectedPhoto(null)}>
-          <DialogContent className="max-w-4xl border-none bg-transparent p-0">
-            {selectedPhoto !== null && (
-              <img
-                src={photos[selectedPhoto].src}
-                alt={photos[selectedPhoto].alt}
-                className="h-auto w-full rounded-lg"
-              />
-            )}
-          </DialogContent>
-        </Dialog>
+        <Lightbox
+          open={index >= 0}
+          index={index}
+          close={() => setIndex(-1)}
+          slides={photos}
+          render={{
+            slide: ({ slide }) => (
+              <div className="relative h-full w-full">
+                <Image
+                  src={slide.src}
+                  alt={slide.alt || ''}
+                  fill
+                  className="object-contain"
+                  sizes="100vw"
+                  priority
+                />
+              </div>
+            ),
+          }}
+        />
 
         <div className="text-center">
           <p className="elegant-serif mb-2 text-xl text-foreground sm:text-2xl">
