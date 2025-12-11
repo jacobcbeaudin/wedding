@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 import CoastalLayout from '@/components/CoastalLayout';
 import SectionDivider from '@/components/SectionDivider';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
@@ -34,14 +35,16 @@ export default function Photos() {
           {photos.map((photo, index) => (
             <div
               key={index}
-              className="coastal-shadow hover-elevate group cursor-pointer overflow-hidden rounded-lg"
+              className="coastal-shadow hover-elevate group relative aspect-[4/3] cursor-pointer overflow-hidden rounded-lg"
               onClick={() => setSelectedPhoto(index)}
               data-testid={`photo-${index}`}
             >
-              <img
+              <Image
                 src={photo.src}
                 alt={photo.alt}
-                className="h-64 w-full object-cover transition-transform duration-300 group-hover:scale-105 sm:h-80"
+                fill
+                className="object-cover transition-transform duration-300 group-hover:scale-105"
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
               />
             </div>
           ))}
@@ -50,11 +53,16 @@ export default function Photos() {
         <Dialog open={selectedPhoto !== null} onOpenChange={() => setSelectedPhoto(null)}>
           <DialogContent className="max-w-4xl border-none bg-transparent p-0">
             {selectedPhoto !== null && (
-              <img
-                src={photos[selectedPhoto].src}
-                alt={photos[selectedPhoto].alt}
-                className="h-auto w-full rounded-lg"
-              />
+              <div className="relative aspect-[4/3]">
+                <Image
+                  src={photos[selectedPhoto].src}
+                  alt={photos[selectedPhoto].alt}
+                  fill
+                  className="rounded-lg object-contain"
+                  sizes="100vw"
+                  priority
+                />
+              </div>
             )}
           </DialogContent>
         </Dialog>
