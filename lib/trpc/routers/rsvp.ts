@@ -361,7 +361,6 @@ export const rsvpRouter = router({
 
     // Send confirmation email (non-blocking, don't fail RSVP if email fails)
     const emailData = {
-      partyName: party.name,
       partyEmail: party.email,
       guests: updatedParty.guests.map((guest) => ({
         name: `${guest.firstName} ${guest.lastName}`,

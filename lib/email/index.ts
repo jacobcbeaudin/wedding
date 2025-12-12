@@ -7,7 +7,6 @@ import { Resend } from 'resend';
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
 export interface RsvpConfirmationData {
-  partyName: string;
   partyEmail: string;
   guests: Array<{
     name: string;
