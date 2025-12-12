@@ -15,14 +15,10 @@ import {
 } from '@/components/ui/table';
 import { trpc } from '@/components/providers/trpc-provider';
 
-interface RsvpsTabProps {
-  adminToken: string;
-}
-
 type SortField = 'guest' | 'party' | 'event' | 'status' | 'meal' | 'updated';
 type SortDirection = 'asc' | 'desc';
 
-export function RsvpsTab({ adminToken }: RsvpsTabProps) {
+export function RsvpsTab() {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'attending' | 'declined' | 'pending'>(
     'all'
@@ -31,8 +27,8 @@ export function RsvpsTab({ adminToken }: RsvpsTabProps) {
   const [sortField, setSortField] = useState<SortField>('updated');
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
 
-  const { data: rsvps, isLoading } = trpc.admin.listRsvps.useQuery({ adminToken });
-  const { data: events } = trpc.admin.listEvents.useQuery({ adminToken });
+  const { data: rsvps, isLoading } = trpc.admin.listRsvps.useQuery();
+  const { data: events } = trpc.admin.listEvents.useQuery();
 
   const downloadCSV = () => {
     if (!rsvps) return;

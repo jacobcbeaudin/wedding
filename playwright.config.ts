@@ -1,5 +1,12 @@
 import { defineConfig, devices } from '@playwright/test';
 import 'dotenv/config';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+const ADMIN_STORAGE_STATE = join(__dirname, 'tests/e2e/.auth/admin.json');
 
 export default defineConfig({
   testDir: './tests/e2e',
@@ -7,15 +14,34 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
   workers: process.env.CI ? 1 : undefined,
-  reporter: 'html',
+  reporter: process.env.CI ? 'github' : 'html',
+  // Seed database before running tests
+  globalSetup: './tests/e2e/global-setup.ts',
   use: {
     baseURL: 'http://localhost:3000',
     trace: 'on-first-retry',
   },
   projects: [
+    // Setup project - authenticates and saves state
+    {
+      name: 'setup',
+      testMatch: /auth\.setup\.ts/,
+    },
+    // Main tests that don't need admin auth
     {
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
+      testIgnore: /admin\.spec\.ts|admin-api\.spec\.ts|auth\.setup\.ts/,
+    },
+    // Admin tests that need authentication
+    {
+      name: 'admin',
+      use: {
+        ...devices['Desktop Chrome'],
+        storageState: ADMIN_STORAGE_STATE,
+      },
+      testMatch: /admin\.spec\.ts|admin-api\.spec\.ts/,
+      dependencies: ['setup'],
     },
   ],
   webServer: {

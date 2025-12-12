@@ -31,11 +31,7 @@ import {
 } from '@/components/ui/table';
 import { trpc } from '@/components/providers/trpc-provider';
 
-interface GuestsTabProps {
-  adminToken: string;
-}
-
-export function GuestsTab({ adminToken }: GuestsTabProps) {
+export function GuestsTab() {
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [editingGuest, setEditingGuest] = useState<{
@@ -49,8 +45,8 @@ export function GuestsTab({ adminToken }: GuestsTabProps) {
   const [newGuestPartyId, setNewGuestPartyId] = useState<string>('');
 
   const utils = trpc.useUtils();
-  const { data: guests, isLoading } = trpc.admin.listGuests.useQuery({ adminToken });
-  const { data: parties } = trpc.admin.listParties.useQuery({ adminToken });
+  const { data: guests, isLoading } = trpc.admin.listGuests.useQuery();
+  const { data: parties } = trpc.admin.listParties.useQuery();
 
   const createMutation = trpc.admin.createGuest.useMutation({
     onSuccess: () => {
@@ -83,7 +79,6 @@ export function GuestsTab({ adminToken }: GuestsTabProps) {
     const form = e.currentTarget;
     const formData = new FormData(form);
     createMutation.mutate({
-      adminToken,
       partyId: newGuestPartyId,
       firstName: formData.get('firstName') as string,
       lastName: formData.get('lastName') as string,
@@ -99,7 +94,6 @@ export function GuestsTab({ adminToken }: GuestsTabProps) {
     const form = e.currentTarget;
     const formData = new FormData(form);
     updateMutation.mutate({
-      adminToken,
       id: editingGuest.id,
       firstName: formData.get('firstName') as string,
       lastName: formData.get('lastName') as string,
@@ -111,7 +105,7 @@ export function GuestsTab({ adminToken }: GuestsTabProps) {
 
   const handleDelete = (id: string, name: string) => {
     if (confirm(`Delete guest "${name}"?`)) {
-      deleteMutation.mutate({ adminToken, id });
+      deleteMutation.mutate({ id });
     }
   };
 

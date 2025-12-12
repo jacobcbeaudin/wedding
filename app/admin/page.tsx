@@ -25,45 +25,62 @@ import {
   Gem,
 } from 'lucide-react';
 
-const ADMIN_TOKEN_KEY = 'admin_token';
-
 export default function AdminPage() {
-  const [adminToken, setAdminToken] = useState<string | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
 
+  // Check session status on mount
   useEffect(() => {
-    const stored = localStorage.getItem(ADMIN_TOKEN_KEY);
-    if (stored) {
-      setAdminToken(stored);
-    }
+    fetch('/api/admin/session')
+      .then((res) => res.json())
+      .then((data) => setIsAuthenticated(data.authenticated))
+      .catch(() => setIsAuthenticated(false));
   }, []);
 
-  const loginMutation = trpc.admin.login.useMutation({
-    onSuccess: () => {
-      localStorage.setItem(ADMIN_TOKEN_KEY, password);
-      setAdminToken(password);
-      setPassword('');
-      setError('');
-    },
-    onError: (err) => {
-      setError(err.message || 'Invalid password');
-    },
-  });
-
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    loginMutation.mutate({ password });
+    setIsLoggingIn(true);
+
+    try {
+      const res = await fetch('/api/admin/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password }),
+      });
+      const data = await res.json();
+
+      if (res.ok) {
+        setIsAuthenticated(true);
+        setPassword('');
+      } else {
+        setError(data.error || 'Invalid password');
+      }
+    } catch {
+      setError('Something went wrong. Please try again.');
+    } finally {
+      setIsLoggingIn(false);
+    }
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem(ADMIN_TOKEN_KEY);
-    setAdminToken(null);
+  const handleLogout = async () => {
+    await fetch('/api/admin/logout', { method: 'POST' });
+    setIsAuthenticated(false);
   };
+
+  // Loading state
+  if (isAuthenticated === null) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="border-primary h-8 w-8 animate-spin rounded-full border-4 border-t-transparent" />
+      </div>
+    );
+  }
 
   // Login screen
-  if (!adminToken) {
+  if (!isAuthenticated) {
     return (
       <div
         className="flex min-h-screen items-center justify-center p-4"
@@ -92,7 +109,7 @@ export default function AdminPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter admin password"
-                disabled={loginMutation.isPending}
+                disabled={isLoggingIn}
                 className="mt-1"
               />
             </div>
@@ -101,12 +118,8 @@ export default function AdminPage() {
                 {error}
               </p>
             )}
-            <Button
-              type="submit"
-              className="w-full"
-              disabled={!password || loginMutation.isPending}
-            >
-              {loginMutation.isPending ? 'Logging in...' : 'Login'}
+            <Button type="submit" className="w-full" disabled={!password || isLoggingIn}>
+              {isLoggingIn ? 'Logging in...' : 'Login'}
             </Button>
           </form>
         </Card>
@@ -133,7 +146,7 @@ export default function AdminPage() {
       </header>
 
       <main className="container mx-auto px-4 py-6">
-        <DashboardStats adminToken={adminToken} />
+        <DashboardStats />
 
         <Tabs defaultValue="parties" className="mt-6">
           <TabsList className="mb-4 h-auto flex-wrap">
@@ -160,19 +173,19 @@ export default function AdminPage() {
           </TabsList>
 
           <TabsContent value="parties">
-            <PartiesTab adminToken={adminToken} />
+            <PartiesTab />
           </TabsContent>
           <TabsContent value="guests">
-            <GuestsTab adminToken={adminToken} />
+            <GuestsTab />
           </TabsContent>
           <TabsContent value="events">
-            <EventsTab adminToken={adminToken} />
+            <EventsTab />
           </TabsContent>
           <TabsContent value="rsvps">
-            <RsvpsTab adminToken={adminToken} />
+            <RsvpsTab />
           </TabsContent>
           <TabsContent value="songs">
-            <SongsTab adminToken={adminToken} />
+            <SongsTab />
           </TabsContent>
         </Tabs>
       </main>
@@ -180,8 +193,8 @@ export default function AdminPage() {
   );
 }
 
-function DashboardStats({ adminToken }: { adminToken: string }) {
-  const { data: stats, isLoading } = trpc.admin.getDashboardStats.useQuery({ adminToken });
+function DashboardStats() {
+  const { data: stats, isLoading } = trpc.admin.getDashboardStats.useQuery();
 
   if (isLoading) {
     return (
