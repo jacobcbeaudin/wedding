@@ -237,6 +237,12 @@ RESEND_API_KEY=           # Resend API key (not yet implemented)
 
 ## TODO
 
+### Database Setup
+- [ ] **Create guest list** - Finalize party/guest spreadsheet (see `scripts/guests.example.csv`)
+- [ ] **Seed events** - Create the 3 events (tea ceremony, welcome party, wedding)
+- [ ] **Import guest list** - Run `npm run db:seed:csv` to import parties and guests
+- [ ] **Create invitations** - Link parties to events via admin dashboard
+
 ### Content (Placeholder)
 - [ ] **Our Story page** - Replace placeholder content with real story
 - [ ] **Registry page** - Add actual registry links
