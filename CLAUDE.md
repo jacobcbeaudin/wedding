@@ -12,9 +12,12 @@ npm run check        # TypeScript type checking
 npm run lint         # Run ESLint
 npm run db:push      # Push Drizzle schema to database
 npm run db:studio    # Open Drizzle Studio
+npm run db:seed      # Seed events (edit scripts/seed.ts for guests)
+npm run db:seed:csv  # Import guests from CSV
 npm test             # Run unit tests (watch mode)
 npm run test:run     # Run unit tests (single run)
 npm run test:e2e     # Run Playwright e2e tests
+npm run test:e2e:ui  # Playwright tests with UI
 ```
 
 ## Architecture
@@ -92,6 +95,7 @@ guests  (1) ←→ (N) song_requests
 - **events** - Wedding events (tea ceremony, welcome party, wedding)
 - **invitations** - Which parties are invited to which events
 - **rsvps** - Individual guest responses per event
+- **rsvp_history** - Audit log of RSVP changes (status, meal updates)
 - **song_requests** - Songs requested by guests (tracks who requested)
 
 ### Key Patterns
@@ -170,47 +174,77 @@ The site follows a **coastal luxury aesthetic** with light/dark mode support.
 ```bash
 DATABASE_URL=             # Neon PostgreSQL connection string
 SITE_PASSWORD=            # Password for site access
+ADMIN_PASSWORD=           # Admin dashboard login
 UPSTASH_REDIS_REST_URL=   # Upstash Redis URL (rate limiting)
 UPSTASH_REDIS_REST_TOKEN= # Upstash Redis token
-RESEND_API_KEY=           # Resend API key (RSVP confirmations)
+RESEND_API_KEY=           # Resend API key (not yet implemented)
 ```
+
+## Configuration
+
+- `lib/config/meals.ts` - Meal options (Fish, Beef, Vegetarian)
+- `lib/config/rsvp.ts` - RSVP deadline (2026-08-15), max songs (3), max notes (500 chars)
+
+## tRPC Routers
+
+**Auth Router** (`lib/trpc/routers/auth.ts`):
+- `auth.verify` - Site password verification with rate limiting (5/min)
+
+**RSVP Router** (`lib/trpc/routers/rsvp.ts`):
+- `rsvp.lookup` - Find guest by name (case/accent insensitive)
+- `rsvp.getParty` - Fetch party by ID with full context
+- `rsvp.submit` - Submit RSVPs, dietary info, songs, notes
+
+**Admin Router** (`lib/trpc/routers/admin.ts`):
+- Full CRUD for parties, guests, events, invitations
+- `admin.login` - Admin auth with stricter rate limiting (3/min)
+- `admin.listRsvps` - View all RSVPs with filtering
+- `admin.listSongRequests` - View/delete song requests
+- `admin.getDashboardStats` - Aggregated statistics
+- CSV export for RSVPs and songs
+
+## Implemented Features
+
+### Core Features (Complete)
+- [x] **RSVP System** - Guest lookup, party-based flow, multi-event RSVPs
+- [x] **Meal Selection** - Fish, Beef, Vegetarian options for wedding event
+- [x] **Dietary Restrictions** - Per-guest dietary tracking
+- [x] **Song Requests** - Max 3 per party with artist/title
+- [x] **Party Notes** - Optional message field (500 char limit)
+- [x] **RSVP History** - Audit log of status/meal changes
+- [x] **Deadline Enforcement** - RSVP deadline (2026-08-15)
+
+### Admin Dashboard (Complete)
+- [x] **Admin Auth** - Password-protected with rate limiting
+- [x] **Party Management** - Full CRUD, filter by response status
+- [x] **Guest Management** - Full CRUD, search and sort
+- [x] **Event Management** - Name, date, location, display order
+- [x] **Invitation Management** - Individual and bulk invite
+- [x] **RSVP Viewing** - Filter by event/status/guest
+- [x] **Song Management** - View and delete requests
+- [x] **CSV Export** - RSVPs and song requests
+- [x] **Dashboard Stats** - Response rates, counts
+
+### Infrastructure (Complete)
+- [x] **Rate Limiting** - Upstash Redis (5/min site, 3/min admin)
+- [x] **Password Protection** - Global site access
+- [x] **Mobile Support** - Responsive hamburger menu
+
+### Testing (Complete)
+- [x] **Unit Tests** - 60+ tests for validation, sanitization, schema
+- [x] **E2E Tests** - Password protection, navigation, RSVP flow, admin
 
 ## TODO
 
 ### Content (Placeholder)
-
-- [ ] **Our Story page** - Replace placeholder content with real story, timeline, and photos
-- [ ] **Registry page** - Add actual registry links (Zola, Amazon, etc.)
-- [ ] **FAQ page** - Replace placeholder FAQs with real questions
+- [ ] **Our Story page** - Replace placeholder content with real story
+- [ ] **Registry page** - Add actual registry links
+- [ ] **FAQ page** - Replace placeholder FAQs
 - [ ] **Photo gallery** - Add real engagement/couple photos
 
-### Database Setup
-
-- [ ] **Seed events** - Create the 3 events in database (tea ceremony, welcome party, wedding)
-- [ ] **Import guest list** - Add parties and guests from invitation list
-- [ ] **Create invitations** - Link parties to the events they're invited to
-
-### Features (Unimplemented)
-
-- [ ] **RSVP confirmation emails** - Send email via Resend after RSVP submission
+### Features (In Progress)
+- [ ] **RSVP confirmation emails** - Send email via Resend after submission
   - Add `RESEND_API_KEY` to environment
   - Create email template in `lib/email/`
   - Call from `rsvp.submit` procedure
-- [ ] **Redis rate limiting** - Currently optional, make production-ready
-  - Ensure `UPSTASH_REDIS_*` env vars are set
-  - Add rate limiting to all public procedures
-- [ ] **Admin dashboard** - View RSVPs, manage guests, export data
-- [ ] **Meal selection** - Add meal choice options to RSVP form
-
-### Performance
-
-- [ ] **Image optimization** - Use Next.js `<Image>` component for all photos
-  - Convert to WebP/AVIF formats
-  - Add proper width/height for CLS
-  - Implement blur placeholders
-- [ ] **Bundle optimization** - Analyze and reduce First Load JS (~150kB)
-
-### Testing
-
-- [ ] **E2E tests** - Update Playwright tests for new party-based RSVP flow
-- [ ] **Add integration tests** - Test full RSVP flow with database
+  - Update `confirmationSentAt` field on parties table
