@@ -12,13 +12,9 @@ import {
 } from '@/components/ui/table';
 import { trpc } from '@/components/providers/trpc-provider';
 
-interface SongsTabProps {
-  adminToken: string;
-}
-
-export function SongsTab({ adminToken }: SongsTabProps) {
+export function SongsTab() {
   const utils = trpc.useUtils();
-  const { data: songs, isLoading } = trpc.admin.listSongRequests.useQuery({ adminToken });
+  const { data: songs, isLoading } = trpc.admin.listSongRequests.useQuery();
 
   const deleteMutation = trpc.admin.deleteSongRequest.useMutation({
     onSuccess: () => {
@@ -29,7 +25,7 @@ export function SongsTab({ adminToken }: SongsTabProps) {
 
   const handleDelete = (id: string, song: string) => {
     if (confirm(`Remove "${song}" from requests?`)) {
-      deleteMutation.mutate({ adminToken, id });
+      deleteMutation.mutate({ id });
     }
   };
 

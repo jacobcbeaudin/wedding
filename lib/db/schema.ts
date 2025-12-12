@@ -13,6 +13,7 @@ import {
   pgEnum,
   integer,
   unique,
+  index,
 } from 'drizzle-orm/pg-core';
 
 // Enums
@@ -38,18 +39,22 @@ export const parties = pgTable('parties', {
 /**
  * Guests - Individual people belonging to a party.
  */
-export const guests = pgTable('guests', {
-  id: uuid('id').primaryKey().defaultRandom(),
-  partyId: uuid('party_id')
-    .notNull()
-    .references(() => parties.id, { onDelete: 'cascade' }),
-  firstName: text('first_name').notNull(),
-  lastName: text('last_name').notNull(),
-  isPrimary: boolean('is_primary').notNull().default(false),
-  isChild: boolean('is_child').notNull().default(false),
-  dietaryRestrictions: text('dietary_restrictions'),
-  createdAt: timestamp('created_at').notNull().defaultNow(),
-});
+export const guests = pgTable(
+  'guests',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    partyId: uuid('party_id')
+      .notNull()
+      .references(() => parties.id, { onDelete: 'cascade' }),
+    firstName: text('first_name').notNull(),
+    lastName: text('last_name').notNull(),
+    isPrimary: boolean('is_primary').notNull().default(false),
+    isChild: boolean('is_child').notNull().default(false),
+    dietaryRestrictions: text('dietary_restrictions'),
+    createdAt: timestamp('created_at').notNull().defaultNow(),
+  },
+  (table) => [index('guests_party_id_idx').on(table.partyId)]
+);
 
 /**
  * Events - Wedding events (tea ceremony, welcome party, wedding, etc.)
@@ -120,15 +125,19 @@ export const rsvpHistory = pgTable('rsvp_history', {
 /**
  * Song Requests - Songs requested by parties.
  */
-export const songRequests = pgTable('song_requests', {
-  id: uuid('id').primaryKey().defaultRandom(),
-  partyId: uuid('party_id')
-    .notNull()
-    .references(() => parties.id, { onDelete: 'cascade' }),
-  song: text('song').notNull(),
-  artist: text('artist'),
-  createdAt: timestamp('created_at').notNull().defaultNow(),
-});
+export const songRequests = pgTable(
+  'song_requests',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    partyId: uuid('party_id')
+      .notNull()
+      .references(() => parties.id, { onDelete: 'cascade' }),
+    song: text('song').notNull(),
+    artist: text('artist'),
+    createdAt: timestamp('created_at').notNull().defaultNow(),
+  },
+  (table) => [index('song_requests_party_id_idx').on(table.partyId)]
+);
 
 // ============================================================================
 // RELATIONS

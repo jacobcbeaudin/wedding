@@ -5,22 +5,20 @@ import CoastalLayout from '@/components/CoastalLayout';
 import SectionDivider from '@/components/SectionDivider';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Check, X, Utensils } from 'lucide-react';
-import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
 import { trpc } from '@/components/providers/trpc-provider';
 import { RsvpFormSkeleton } from '@/components/RsvpSkeleton';
 import { MEAL_OPTIONS, MEAL_REQUIRED_EVENT } from '@/lib/config/meals';
 import { MAX_SONG_REQUESTS } from '@/lib/config/rsvp';
-import type {
-  PartyWithDetails,
-  GuestPublic,
-  EventPublic,
-  RsvpResponse,
-} from '@/lib/validations/rsvp';
+import {
+  GuestLookupForm,
+  RsvpEventCard,
+  DietarySection,
+  SongRequestsSection,
+  RsvpConfirmation,
+} from '@/components/rsvp';
+import type { PartyWithDetails, GuestPublic, RsvpResponse } from '@/lib/validations/rsvp';
 
 type RsvpStatus = 'attending' | 'declined';
 type MealChoice = (typeof MEAL_OPTIONS)[number];
@@ -44,6 +42,30 @@ interface GuestDietary {
 interface SongRequest {
   song: string;
   artist: string;
+}
+
+// Helper to format guest names
+function capitalizeName(name: string) {
+  return name
+    .split(/(\s+|-)/g)
+    .map((part) => {
+      if (part === ' ' || part === '-') return part;
+      if (part.includes("'")) {
+        const [before, after] = part.split("'");
+        return (
+          before.charAt(0).toUpperCase() +
+          before.slice(1) +
+          "'" +
+          (after.charAt(0).toUpperCase() + after.slice(1))
+        );
+      }
+      return part.charAt(0).toUpperCase() + part.slice(1);
+    })
+    .join('');
+}
+
+function formatGuestName(guest: GuestPublic) {
+  return `${capitalizeName(guest.firstName)} ${capitalizeName(guest.lastName)}`;
 }
 
 export default function RSVP() {
@@ -230,41 +252,6 @@ export default function RSVP() {
     setSongRequests((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const capitalizeName = (name: string) => {
-    return name
-      .split(/(\s+|-)/g)
-      .map((part) => {
-        if (part === ' ' || part === '-') return part;
-        if (part.includes("'")) {
-          const [before, after] = part.split("'");
-          return (
-            before.charAt(0).toUpperCase() +
-            before.slice(1) +
-            "'" +
-            (after.charAt(0).toUpperCase() + after.slice(1))
-          );
-        }
-        return part.charAt(0).toUpperCase() + part.slice(1);
-      })
-      .join('');
-  };
-
-  const formatGuestName = (guest: GuestPublic) =>
-    `${capitalizeName(guest.firstName)} ${capitalizeName(guest.lastName)}`;
-
-  const formatEventDate = (event: EventPublic) => {
-    if (!event.date) return '';
-    const date = new Date(event.date);
-    return date.toLocaleDateString('en-US', {
-      weekday: 'long',
-      month: 'long',
-      day: 'numeric',
-      year: 'numeric',
-      hour: 'numeric',
-      minute: '2-digit',
-    });
-  };
-
   // Loading screen
   if (step === 'loading') {
     return (
@@ -296,26 +283,13 @@ export default function RSVP() {
             </h1>
           </div>
 
-          <Card className="coastal-shadow mx-auto max-w-2xl border-0 p-8 text-center sm:p-12">
-            <div className="mb-6 text-5xl sm:text-6xl">&#10003;</div>
-            <h2 className="elegant-serif text-primary mb-6 text-2xl sm:text-3xl">
-              Your RSVP is Confirmed
-            </h2>
-            <p className="text-foreground mb-4 text-base sm:text-lg">
-              We can&apos;t wait to celebrate with you on our special day.
-            </p>
-            <p className="text-muted-foreground mb-6 text-sm">Party: {party.name}</p>
-            <Button
-              variant="outline"
-              onClick={() => {
-                initializeFormState(party);
-                setStep('form');
-              }}
-              data-testid="button-edit-rsvp"
-            >
-              Edit My RSVP
-            </Button>
-          </Card>
+          <RsvpConfirmation
+            party={party}
+            onEditRsvp={() => {
+              initializeFormState(party);
+              setStep('form');
+            }}
+          />
         </div>
       </CoastalLayout>
     );
@@ -363,201 +337,34 @@ export default function RSVP() {
 
             <div className="space-y-6 sm:space-y-8">
               {party.invitedEvents.map(({ event }) => (
-                <div key={event.id} className="bg-muted/30 rounded-lg p-4 sm:p-6">
-                  <div className="mb-4">
-                    <h4 className="text-foreground text-base font-medium sm:text-lg">
-                      {event.name}
-                    </h4>
-                    <p className="text-muted-foreground text-xs sm:text-sm">
-                      {formatEventDate(event)}
-                    </p>
-                    {event.location && (
-                      <p className="text-muted-foreground text-xs sm:text-sm">{event.location}</p>
-                    )}
-                  </div>
-
-                  {/* RSVP for each guest */}
-                  <div className="space-y-3">
-                    {party.guests.map((guest) => {
-                      const rsvpState = rsvpSelections.find(
-                        (r) => r.guestId === guest.id && r.eventId === event.id
-                      );
-                      const showMealSelection =
-                        event.slug === MEAL_REQUIRED_EVENT && rsvpState?.status === 'attending';
-
-                      return (
-                        <div
-                          key={`${guest.id}-${event.id}`}
-                          className="bg-background/50 rounded-lg p-4"
-                        >
-                          <div className="mb-3">
-                            <span className="text-foreground text-sm font-medium">
-                              {formatGuestName(guest)}
-                            </span>
-                          </div>
-
-                          {/* Modern toggle buttons for Accept/Decline */}
-                          <div className="flex gap-3">
-                            <button
-                              type="button"
-                              onClick={() => updateRsvpSelection(guest.id, event.id, 'attending')}
-                              data-testid={`radio-${event.slug}-${guest.id}-attending`}
-                              className={cn(
-                                'flex flex-1 items-center justify-center gap-2 rounded-lg border px-4 py-3 text-sm font-medium transition-all',
-                                rsvpState?.status === 'attending'
-                                  ? 'border-primary bg-primary text-primary-foreground coastal-shadow'
-                                  : 'border-border bg-card text-muted-foreground hover:border-primary/40 hover:text-foreground'
-                              )}
-                            >
-                              <Check className="h-4 w-4" />
-                              <span>Joyfully Accept</span>
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => updateRsvpSelection(guest.id, event.id, 'declined')}
-                              data-testid={`radio-${event.slug}-${guest.id}-declined`}
-                              className={cn(
-                                'flex flex-1 items-center justify-center gap-2 rounded-lg border px-4 py-3 text-sm font-medium transition-all',
-                                rsvpState?.status === 'declined'
-                                  ? 'border-muted-foreground/50 bg-muted text-foreground'
-                                  : 'border-border bg-card text-muted-foreground hover:border-muted-foreground/40 hover:text-foreground'
-                              )}
-                            >
-                              <X className="h-4 w-4" />
-                              <span>Regretfully Decline</span>
-                            </button>
-                          </div>
-
-                          {/* Meal Selection - elegant card buttons */}
-                          {showMealSelection && (
-                            <div className="border-border/50 mt-4 border-t pt-4">
-                              <div className="text-muted-foreground mb-3 flex items-center gap-2 text-xs">
-                                <Utensils className="h-3 w-3" />
-                                <span className="italic">Select your entrée</span>
-                              </div>
-                              <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
-                                {MEAL_OPTIONS.map((meal) => (
-                                  <button
-                                    key={meal}
-                                    type="button"
-                                    onClick={() => updateMealChoice(guest.id, event.id, meal)}
-                                    data-testid={`radio-meal-${guest.id}-${meal.toLowerCase()}`}
-                                    className={cn(
-                                      'rounded-lg border px-4 py-3 text-sm font-medium transition-all',
-                                      rsvpState?.mealChoice === meal
-                                        ? 'border-primary bg-primary/10 text-foreground coastal-shadow'
-                                        : 'border-border bg-card text-muted-foreground hover:border-primary/40 hover:text-foreground'
-                                    )}
-                                  >
-                                    {meal}
-                                  </button>
-                                ))}
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
+                <RsvpEventCard
+                  key={event.id}
+                  event={event}
+                  guests={party.guests}
+                  rsvpSelections={rsvpSelections}
+                  onStatusChange={updateRsvpSelection}
+                  onMealChange={updateMealChoice}
+                  formatGuestName={formatGuestName}
+                />
               ))}
             </div>
           </Card>
 
           {/* Dietary Restrictions */}
-          <Card className="coastal-shadow mb-6 border-0 p-6 sm:mb-8 sm:p-8">
-            <h3 className="text-foreground mb-6 text-lg font-medium sm:text-xl">
-              Dietary Restrictions
-            </h3>
-            <div className="space-y-4">
-              {party.guests.map((guest) => {
-                const dietary = dietaryInfo.find((d) => d.guestId === guest.id);
-                return (
-                  <div key={guest.id}>
-                    <Label
-                      htmlFor={`dietary-${guest.id}`}
-                      className="text-foreground mb-2 block text-sm font-medium"
-                    >
-                      {formatGuestName(guest)}
-                    </Label>
-                    <Input
-                      id={`dietary-${guest.id}`}
-                      placeholder="Any dietary restrictions or allergies..."
-                      value={dietary?.dietaryRestrictions || ''}
-                      onChange={(e) => updateDietary(guest.id, e.target.value)}
-                      data-testid={`input-dietary-${guest.id}`}
-                    />
-                  </div>
-                );
-              })}
-            </div>
-          </Card>
+          <DietarySection
+            guests={party.guests}
+            dietaryInfo={dietaryInfo}
+            onDietaryChange={updateDietary}
+            formatGuestName={formatGuestName}
+          />
 
           {/* Song Requests */}
-          <Card className="coastal-shadow mb-6 border-0 p-6 sm:mb-8 sm:p-8">
-            <h3 className="text-foreground mb-6 text-lg font-medium sm:text-xl">Song Requests</h3>
-            <p className="text-muted-foreground mb-4 text-sm">
-              Any songs you&apos;d love to hear at the reception? (Max {MAX_SONG_REQUESTS})
-            </p>
-            <div className="space-y-4">
-              {songRequests.map((sr, index) => (
-                <div key={index} className="flex flex-col gap-2 sm:flex-row sm:items-end sm:gap-4">
-                  <div className="flex-1">
-                    <Label
-                      htmlFor={`song-${index}`}
-                      className="text-muted-foreground mb-1 block text-xs"
-                    >
-                      Song
-                    </Label>
-                    <Input
-                      id={`song-${index}`}
-                      placeholder="Song name..."
-                      value={sr.song}
-                      onChange={(e) => updateSongRequest(index, 'song', e.target.value)}
-                      data-testid={`input-song-${index}`}
-                    />
-                  </div>
-                  <div className="flex-1">
-                    <Label
-                      htmlFor={`artist-${index}`}
-                      className="text-muted-foreground mb-1 block text-xs"
-                    >
-                      Artist (optional)
-                    </Label>
-                    <Input
-                      id={`artist-${index}`}
-                      placeholder="Artist name..."
-                      value={sr.artist}
-                      onChange={(e) => updateSongRequest(index, 'artist', e.target.value)}
-                      data-testid={`input-artist-${index}`}
-                    />
-                  </div>
-                  {songRequests.length > 1 && (
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => removeSongRequest(index)}
-                      className="text-muted-foreground hover:text-destructive"
-                    >
-                      Remove
-                    </Button>
-                  )}
-                </div>
-              ))}
-              {songRequests.length < MAX_SONG_REQUESTS && (
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={addSongRequest}
-                  className="mt-2"
-                >
-                  + Add Another Song
-                </Button>
-              )}
-            </div>
-          </Card>
+          <SongRequestsSection
+            songRequests={songRequests}
+            onSongChange={updateSongRequest}
+            onAddSong={addSongRequest}
+            onRemoveSong={removeSongRequest}
+          />
 
           {/* Notes */}
           <Card className="coastal-shadow mb-6 border-0 p-6 sm:mb-8 sm:p-8">
@@ -619,66 +426,15 @@ export default function RSVP() {
 
         <SectionDivider />
 
-        <Card className="coastal-shadow mx-auto max-w-2xl border-0 p-6 sm:p-10">
-          <h2 className="elegant-serif text-primary mb-6 text-center text-2xl sm:text-3xl">
-            Find Your Invitation
-          </h2>
-
-          <p className="text-muted-foreground mb-6 text-center text-sm sm:mb-8 sm:text-base">
-            Please enter your name as it appears on your invitation
-          </p>
-
-          <div className="space-y-4 sm:space-y-6">
-            <div>
-              <Label htmlFor="first-name" className="mb-2 block text-sm font-medium sm:text-base">
-                First Name
-              </Label>
-              <Input
-                id="first-name"
-                placeholder="Enter your first name..."
-                value={firstName}
-                onChange={(e) => setFirstName(e.target.value)}
-                disabled={lookupMutation.isPending}
-                data-testid="input-first-name"
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="last-name" className="mb-2 block text-sm font-medium sm:text-base">
-                Last Name
-              </Label>
-              <Input
-                id="last-name"
-                placeholder="Enter your last name..."
-                value={lastName}
-                onChange={(e) => setLastName(e.target.value)}
-                disabled={lookupMutation.isPending}
-                data-testid="input-last-name"
-              />
-            </div>
-
-            {lookupError && <p className="text-destructive text-sm">{lookupError}</p>}
-
-            <Button
-              onClick={handleLookup}
-              disabled={!firstName || !lastName || lookupMutation.isPending}
-              className="w-full"
-              size="lg"
-              data-testid="button-lookup-guest"
-            >
-              {lookupMutation.isPending ? 'Searching...' : 'Find My Invitation'}
-            </Button>
-          </div>
-
-          <div className="bg-muted/30 mt-6 rounded p-4 text-center sm:mt-8 sm:p-6">
-            <p className="text-muted-foreground text-xs sm:text-sm">
-              Can&apos;t find your invitation? Contact us at{' '}
-              <a href="mailto:wedding@carolineandjake.com" className="text-primary underline">
-                wedding@carolineandjake.com
-              </a>
-            </p>
-          </div>
-        </Card>
+        <GuestLookupForm
+          firstName={firstName}
+          lastName={lastName}
+          onFirstNameChange={setFirstName}
+          onLastNameChange={setLastName}
+          onSubmit={handleLookup}
+          isLoading={lookupMutation.isPending}
+          error={lookupError}
+        />
       </div>
     </CoastalLayout>
   );

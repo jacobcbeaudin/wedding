@@ -1,62 +1,15 @@
 /**
- * Admin router - handles admin authentication and CRUD operations.
+ * Admin router - handles admin CRUD operations.
+ * Authentication is handled via HttpOnly session cookies.
  */
 
 import { z } from 'zod';
-import { eq, desc, asc } from 'drizzle-orm';
-import { Ratelimit } from '@upstash/ratelimit';
-import { Redis } from '@upstash/redis';
-import { router, publicProcedure, adminProcedure, TRPCError } from '../init';
+import { eq, desc, asc, sql } from 'drizzle-orm';
+import { router, adminProcedure, TRPCError } from '../init';
 import { db } from '@/lib/db';
 import { parties, guests, events, invitations, rsvps, songRequests } from '@/lib/db/schema';
 
-// Rate limiter for admin login - stricter than site auth (3 attempts per minute)
-const adminRatelimit = process.env.UPSTASH_REDIS_REST_URL
-  ? new Ratelimit({
-      redis: Redis.fromEnv(),
-      limiter: Ratelimit.slidingWindow(3, '1 m'),
-      analytics: true,
-      prefix: 'wedding:admin',
-    })
-  : null;
-
 export const adminRouter = router({
-  // ============================================================================
-  // AUTH
-  // ============================================================================
-
-  login: publicProcedure
-    .input(z.object({ password: z.string().min(1, { error: 'Password is required' }) }))
-    .mutation(async ({ input, ctx }) => {
-      // Rate limit admin login attempts (3 per minute per IP)
-      if (adminRatelimit) {
-        const { success } = await adminRatelimit.limit(ctx.ip);
-        if (!success) {
-          throw new TRPCError({
-            code: 'TOO_MANY_REQUESTS',
-            message: 'Too many login attempts. Please wait before trying again.',
-          });
-        }
-      }
-
-      const adminPassword = process.env.ADMIN_PASSWORD;
-      if (!adminPassword) {
-        throw new TRPCError({
-          code: 'INTERNAL_SERVER_ERROR',
-          message: 'Admin not configured',
-        });
-      }
-
-      if (input.password !== adminPassword) {
-        throw new TRPCError({
-          code: 'UNAUTHORIZED',
-          message: 'Invalid admin password',
-        });
-      }
-
-      return { success: true };
-    }),
-
   // ============================================================================
   // PARTIES
   // ============================================================================
@@ -409,29 +362,42 @@ export const adminRouter = router({
   // ============================================================================
 
   getDashboardStats: adminProcedure.query(async () => {
-    const [allParties, allGuests, allEvents, allRsvps, allSongRequests] = await Promise.all([
-      db.query.parties.findMany(),
-      db.query.guests.findMany(),
-      db.query.events.findMany(),
-      db.query.rsvps.findMany(),
-      db.query.songRequests.findMany(),
+    // Use COUNT queries instead of loading all records for efficiency
+    const [partyCounts, guestCount, eventCount, rsvpCounts, songRequestCount] = await Promise.all([
+      // Count parties and parties with submissions
+      db
+        .select({
+          total: sql<number>`count(*)::int`,
+          responded: sql<number>`count(*) filter (where ${parties.submittedAt} is not null)::int`,
+        })
+        .from(parties),
+      // Count guests
+      db.select({ count: sql<number>`count(*)::int` }).from(guests),
+      // Count events
+      db.select({ count: sql<number>`count(*)::int` }).from(events),
+      // Count RSVPs by status
+      db
+        .select({
+          total: sql<number>`count(*)::int`,
+          attending: sql<number>`count(*) filter (where ${rsvps.status} = 'attending')::int`,
+          declined: sql<number>`count(*) filter (where ${rsvps.status} = 'declined')::int`,
+          pending: sql<number>`count(*) filter (where ${rsvps.status} = 'pending')::int`,
+        })
+        .from(rsvps),
+      // Count song requests
+      db.select({ count: sql<number>`count(*)::int` }).from(songRequests),
     ]);
 
-    const partiesWithSubmission = allParties.filter((p) => p.submittedAt);
-    const attendingRsvps = allRsvps.filter((r) => r.status === 'attending');
-    const declinedRsvps = allRsvps.filter((r) => r.status === 'declined');
-    const pendingRsvps = allRsvps.filter((r) => r.status === 'pending');
-
     return {
-      totalParties: allParties.length,
-      partiesResponded: partiesWithSubmission.length,
-      totalGuests: allGuests.length,
-      totalEvents: allEvents.length,
-      totalRsvps: allRsvps.length,
-      attendingCount: attendingRsvps.length,
-      declinedCount: declinedRsvps.length,
-      pendingCount: pendingRsvps.length,
-      songRequestCount: allSongRequests.length,
+      totalParties: partyCounts[0]?.total ?? 0,
+      partiesResponded: partyCounts[0]?.responded ?? 0,
+      totalGuests: guestCount[0]?.count ?? 0,
+      totalEvents: eventCount[0]?.count ?? 0,
+      totalRsvps: rsvpCounts[0]?.total ?? 0,
+      attendingCount: rsvpCounts[0]?.attending ?? 0,
+      declinedCount: rsvpCounts[0]?.declined ?? 0,
+      pendingCount: rsvpCounts[0]?.pending ?? 0,
+      songRequestCount: songRequestCount[0]?.count ?? 0,
     };
   }),
 });

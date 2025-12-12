@@ -23,11 +23,7 @@ import {
 } from '@/components/ui/table';
 import { trpc } from '@/components/providers/trpc-provider';
 
-interface EventsTabProps {
-  adminToken: string;
-}
-
-export function EventsTab({ adminToken }: EventsTabProps) {
+export function EventsTab() {
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [editingEvent, setEditingEvent] = useState<{
     id: string;
@@ -40,7 +36,7 @@ export function EventsTab({ adminToken }: EventsTabProps) {
   } | null>(null);
 
   const utils = trpc.useUtils();
-  const { data: events, isLoading } = trpc.admin.listEvents.useQuery({ adminToken });
+  const { data: events, isLoading } = trpc.admin.listEvents.useQuery();
 
   const createMutation = trpc.admin.createEvent.useMutation({
     onSuccess: () => {
@@ -69,7 +65,6 @@ export function EventsTab({ adminToken }: EventsTabProps) {
     const form = e.currentTarget;
     const formData = new FormData(form);
     createMutation.mutate({
-      adminToken,
       slug: formData.get('slug') as string,
       name: formData.get('name') as string,
       date: (formData.get('date') as string) || null,
@@ -85,7 +80,6 @@ export function EventsTab({ adminToken }: EventsTabProps) {
     const form = e.currentTarget;
     const formData = new FormData(form);
     updateMutation.mutate({
-      adminToken,
       id: editingEvent.id,
       slug: formData.get('slug') as string,
       name: formData.get('name') as string,
@@ -102,7 +96,7 @@ export function EventsTab({ adminToken }: EventsTabProps) {
         `Delete event "${name}"? This will also delete all invitations and RSVPs for this event.`
       )
     ) {
-      deleteMutation.mutate({ adminToken, id });
+      deleteMutation.mutate({ id });
     }
   };
 

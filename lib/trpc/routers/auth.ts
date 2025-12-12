@@ -38,7 +38,7 @@ export const authRouter = router({
         });
       }
 
-      if (input.password.toLowerCase() !== sitePassword.toLowerCase()) {
+      if (input.password !== sitePassword) {
         throw new TRPCError({
           code: 'UNAUTHORIZED',
           message: 'Incorrect password',

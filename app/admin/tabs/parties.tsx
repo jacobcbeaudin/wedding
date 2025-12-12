@@ -25,11 +25,7 @@ import {
 import { trpc } from '@/components/providers/trpc-provider';
 import { Plus, Pencil, Trash2, Search, CheckCircle, Clock } from 'lucide-react';
 
-interface PartiesTabProps {
-  adminToken: string;
-}
-
-export function PartiesTab({ adminToken }: PartiesTabProps) {
+export function PartiesTab() {
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'responded' | 'pending'>('all');
@@ -41,8 +37,8 @@ export function PartiesTab({ adminToken }: PartiesTabProps) {
   } | null>(null);
 
   const utils = trpc.useUtils();
-  const { data: parties, isLoading } = trpc.admin.listParties.useQuery({ adminToken });
-  const { data: allEvents } = trpc.admin.listEvents.useQuery({ adminToken });
+  const { data: parties, isLoading } = trpc.admin.listParties.useQuery();
+  const { data: allEvents } = trpc.admin.listEvents.useQuery();
 
   const createMutation = trpc.admin.createParty.useMutation({
     onSuccess: () => {
@@ -78,7 +74,6 @@ export function PartiesTab({ adminToken }: PartiesTabProps) {
     const form = e.currentTarget;
     const formData = new FormData(form);
     createMutation.mutate({
-      adminToken,
       name: formData.get('name') as string,
       email: formData.get('email') as string,
       notes: (formData.get('notes') as string) || null,
@@ -91,7 +86,6 @@ export function PartiesTab({ adminToken }: PartiesTabProps) {
     const form = e.currentTarget;
     const formData = new FormData(form);
     updateMutation.mutate({
-      adminToken,
       id: editingParty.id,
       name: formData.get('name') as string,
       email: formData.get('email') as string,
@@ -101,7 +95,7 @@ export function PartiesTab({ adminToken }: PartiesTabProps) {
 
   const handleDelete = (id: string, name: string) => {
     if (confirm(`Delete party "${name}"? This will also delete all guests in this party.`)) {
-      deleteMutation.mutate({ adminToken, id });
+      deleteMutation.mutate({ id });
     }
   };
 
@@ -117,7 +111,6 @@ export function PartiesTab({ adminToken }: PartiesTabProps) {
       : [...currentEventIds, eventId];
 
     bulkInviteMutation.mutate({
-      adminToken,
       partyId,
       eventIds: newEventIds,
     });
