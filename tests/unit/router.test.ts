@@ -31,38 +31,40 @@ describe('router', () => {
   describe('auth.verify', () => {
     it('accepts correct password', async () => {
       const { appRouter } = await import('../../lib/trpc/router');
-      const caller = appRouter.createCaller({ ip: '127.0.0.1' });
+      const caller = appRouter.createCaller({ ip: '127.0.0.1', isAdmin: false });
 
       const result = await caller.auth.verify({ password: 'testpassword' });
       expect(result.success).toBe(true);
     });
 
-    it('accepts password case-insensitively', async () => {
+    it('rejects password with wrong case', async () => {
       const { appRouter } = await import('../../lib/trpc/router');
-      const caller = appRouter.createCaller({ ip: '127.0.0.1' });
+      const caller = appRouter.createCaller({ ip: '127.0.0.1', isAdmin: false });
 
-      const result = await caller.auth.verify({ password: 'TESTPASSWORD' });
-      expect(result.success).toBe(true);
+      await expect(caller.auth.verify({ password: 'TESTPASSWORD' })).rejects.toThrow(
+        'Incorrect password'
+      );
     });
 
-    it('accepts password with mixed case', async () => {
+    it('rejects password with mixed case', async () => {
       const { appRouter } = await import('../../lib/trpc/router');
-      const caller = appRouter.createCaller({ ip: '127.0.0.1' });
+      const caller = appRouter.createCaller({ ip: '127.0.0.1', isAdmin: false });
 
-      const result = await caller.auth.verify({ password: 'TestPassword' });
-      expect(result.success).toBe(true);
+      await expect(caller.auth.verify({ password: 'TestPassword' })).rejects.toThrow(
+        'Incorrect password'
+      );
     });
 
     it('rejects incorrect password', async () => {
       const { appRouter } = await import('../../lib/trpc/router');
-      const caller = appRouter.createCaller({ ip: '127.0.0.1' });
+      const caller = appRouter.createCaller({ ip: '127.0.0.1', isAdmin: false });
 
       await expect(caller.auth.verify({ password: 'wrong' })).rejects.toThrow('Incorrect password');
     });
 
     it('rejects empty password', async () => {
       const { appRouter } = await import('../../lib/trpc/router');
-      const caller = appRouter.createCaller({ ip: '127.0.0.1' });
+      const caller = appRouter.createCaller({ ip: '127.0.0.1', isAdmin: false });
 
       // Zod validation requires min(1)
       await expect(caller.auth.verify({ password: '' })).rejects.toThrow();
@@ -71,7 +73,7 @@ describe('router', () => {
     it('throws error when SITE_PASSWORD not configured', async () => {
       delete process.env.SITE_PASSWORD;
       const { appRouter } = await import('../../lib/trpc/router');
-      const caller = appRouter.createCaller({ ip: '127.0.0.1' });
+      const caller = appRouter.createCaller({ ip: '127.0.0.1', isAdmin: false });
 
       await expect(caller.auth.verify({ password: 'test' })).rejects.toThrow(
         'Server configuration error'
@@ -80,7 +82,7 @@ describe('router', () => {
 
     it('does not trim password whitespace (strict matching)', async () => {
       const { appRouter } = await import('../../lib/trpc/router');
-      const caller = appRouter.createCaller({ ip: '127.0.0.1' });
+      const caller = appRouter.createCaller({ ip: '127.0.0.1', isAdmin: false });
 
       // Password is 'testpassword', input with whitespace should fail
       await expect(caller.auth.verify({ password: ' testpassword ' })).rejects.toThrow(
@@ -92,7 +94,7 @@ describe('router', () => {
       vi.resetModules();
       process.env.SITE_PASSWORD = 'test@123!';
       const { appRouter } = await import('../../lib/trpc/router');
-      const caller = appRouter.createCaller({ ip: '127.0.0.1' });
+      const caller = appRouter.createCaller({ ip: '127.0.0.1', isAdmin: false });
 
       const result = await caller.auth.verify({ password: 'test@123!' });
       expect(result.success).toBe(true);
@@ -102,9 +104,9 @@ describe('router', () => {
       vi.resetModules();
       process.env.SITE_PASSWORD = 'пароль';
       const { appRouter } = await import('../../lib/trpc/router');
-      const caller = appRouter.createCaller({ ip: '127.0.0.1' });
+      const caller = appRouter.createCaller({ ip: '127.0.0.1', isAdmin: false });
 
-      const result = await caller.auth.verify({ password: 'ПАРОЛЬ' });
+      const result = await caller.auth.verify({ password: 'пароль' });
       expect(result.success).toBe(true);
     });
   });

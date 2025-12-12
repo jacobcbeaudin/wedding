@@ -4,7 +4,6 @@
 
 import { initTRPC, TRPCError } from '@trpc/server';
 import superjson from 'superjson';
-import { z } from 'zod';
 import type { Context } from './context';
 
 const t = initTRPC.context<Context>().create({
@@ -34,25 +33,16 @@ export const publicProcedure = t.procedure;
 
 /**
  * Admin procedure with authentication middleware.
- * Validates adminToken before running the procedure.
+ * Checks for admin session cookie via context.
  */
-export const adminProcedure = t.procedure
-  .input(z.object({ adminToken: z.string() }))
-  .use(async ({ input, next }) => {
-    const adminPassword = process.env.ADMIN_PASSWORD;
-    if (!adminPassword) {
-      throw new TRPCError({
-        code: 'INTERNAL_SERVER_ERROR',
-        message: 'Admin not configured',
-      });
-    }
-    if (input.adminToken !== adminPassword) {
-      throw new TRPCError({
-        code: 'UNAUTHORIZED',
-        message: 'Invalid admin credentials',
-      });
-    }
-    return next();
-  });
+export const adminProcedure = t.procedure.use(async ({ ctx, next }) => {
+  if (!ctx.isAdmin) {
+    throw new TRPCError({
+      code: 'UNAUTHORIZED',
+      message: 'Admin authentication required',
+    });
+  }
+  return next();
+});
 
 export { TRPCError };

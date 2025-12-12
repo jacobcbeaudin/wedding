@@ -179,12 +179,16 @@ The site follows a **modern coastal aesthetic** with light/dark mode support.
 ## Environment Variables
 
 ```bash
-DATABASE_URL=             # Neon PostgreSQL connection string
-SITE_PASSWORD=            # Password for site access
-ADMIN_PASSWORD=           # Admin dashboard login
-UPSTASH_REDIS_REST_URL=   # Upstash Redis URL (rate limiting)
-UPSTASH_REDIS_REST_TOKEN= # Upstash Redis token
-RESEND_API_KEY=           # Resend API key (confirmation emails)
+DATABASE_URL=                   # Neon PostgreSQL connection string
+SITE_PASSWORD=                  # Password for site access
+ADMIN_PASSWORD=                 # Admin dashboard login
+ADMIN_JWT_SECRET=               # JWT signing secret (optional, falls back to ADMIN_PASSWORD)
+UPSTASH_REDIS_REST_URL=         # Upstash Redis URL (rate limiting)
+UPSTASH_REDIS_REST_TOKEN=       # Upstash Redis token
+RESEND_API_KEY=                 # Resend API key (confirmation emails)
+QSTASH_TOKEN=                   # Upstash QStash token (email queue)
+QSTASH_CURRENT_SIGNING_KEY=     # QStash signature verification
+QSTASH_NEXT_SIGNING_KEY=        # QStash signature verification
 ```
 
 ## Configuration
@@ -207,11 +211,16 @@ RESEND_API_KEY=           # Resend API key (confirmation emails)
 **Admin Router** (`lib/trpc/routers/admin.ts`):
 
 - Full CRUD for parties, guests, events, invitations
-- `admin.login` - Admin auth with stricter rate limiting (3/min)
 - `admin.listRsvps` - View all RSVPs
 - `admin.listSongRequests` - View/delete song requests
-- `admin.getDashboardStats` - Aggregated statistics
+- `admin.getDashboardStats` - Aggregated statistics (uses SQL COUNT)
 - `admin.bulkInvite` - Bulk invite party to multiple events
+
+**Admin API Routes** (`app/api/admin/`):
+
+- `POST /api/admin/login` - Admin auth with HttpOnly cookies and rate limiting (3/min)
+- `POST /api/admin/logout` - Clear admin session
+- `GET /api/admin/session` - Check authentication status
 
 ## Implemented Features
 
@@ -239,13 +248,16 @@ RESEND_API_KEY=           # Resend API key (confirmation emails)
 
 ### Infrastructure (Complete)
 
-- [x] **Rate Limiting** - Upstash Redis (5/min site, 3/min admin)
+- [x] **Rate Limiting** - Upstash Redis (5/min site, 3/min admin, 10/min RSVP submit)
 - [x] **Password Protection** - Global site access
 - [x] **Mobile Support** - Responsive hamburger menu
+- [x] **Security Headers** - HSTS, X-Frame-Options, X-Content-Type-Options, Referrer-Policy
+- [x] **HttpOnly Cookies** - Signed JWT admin sessions (XSS + forgery protection)
+- [x] **Email Queue** - Upstash QStash for background email processing
 
 ### Testing (Complete)
 
-- [x] **Unit Tests** - 240+ tests for validation, sanitization, schema, email
+- [x] **Unit Tests** - 246 tests for validation, sanitization, schema, email, admin auth
 - [x] **E2E Tests** - Password protection, navigation, RSVP flow, admin
 
 ## TODO
@@ -270,3 +282,20 @@ RESEND_API_KEY=           # Resend API key (confirmation emails)
   - Add admin UI to trigger reminders
   - Track `reminderSentAt` on parties table
   - Only send to parties with no `submittedAt`
+
+### Technical Improvements
+
+**Completed**
+
+- [x] **Batch RSVP database operations** - RSVP upserts use single SQL query with UNNEST, history/songs batched, dietary updates parallel
+- [x] **Use COUNT(*) for admin dashboard stats** - SQL aggregation instead of loading all records
+- [x] **Add rate limiting on RSVP submission** - 10 submissions per minute per IP
+- [x] **Add security headers** - HSTS, X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy
+- [x] **Add database indexes** - Indexes on `guests(party_id)` and `song_requests(party_id)`
+- [x] **Extract RSVP page components** - GuestLookupForm, RsvpEventCard, DietarySection, SongRequestsSection, RsvpConfirmation
+- [x] **HttpOnly cookies for admin auth** - Signed JWT tokens with XSS protection
+- [x] **Queue email sending** - Upstash QStash for background email processing with fallback to direct sending
+
+**Future (Nice to Have)**
+
+- [ ] **Application monitoring** - Add Sentry or LogRocket for error tracking and performance monitoring.
