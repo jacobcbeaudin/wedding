@@ -24,9 +24,9 @@ async function verifySiteTokenMiddleware(token: string): Promise<boolean> {
 }
 
 /**
- * Middleware to protect API routes with site authentication.
+ * Proxy to protect API routes with site authentication.
  */
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Public routes - no site auth required
