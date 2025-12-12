@@ -9,6 +9,24 @@ import type { Context } from './context';
 
 const t = initTRPC.context<Context>().create({
   transformer: superjson,
+  errorFormatter({ shape, error }) {
+    // Hide unhandled errors (database failures, etc.) from the client.
+    // Unhandled errors are wrapped by tRPC with:
+    // - code: 'INTERNAL_SERVER_ERROR'
+    // - cause: the original Error
+    // Intentional TRPCErrors thrown without a cause are preserved.
+    const isUnhandledError = error.code === 'INTERNAL_SERVER_ERROR' && error.cause instanceof Error;
+
+    return {
+      ...shape,
+      message: isUnhandledError ? 'Something went wrong. Please try again later.' : shape.message,
+      data: {
+        ...shape.data,
+        // Remove stack traces in production
+        stack: process.env.NODE_ENV === 'development' ? shape.data?.stack : undefined,
+      },
+    };
+  },
 });
 
 export const router = t.router;

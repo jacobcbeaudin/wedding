@@ -118,6 +118,13 @@ export const adminRouter = router({
         .where(eq(parties.id, input.id))
         .returning();
 
+      if (!party) {
+        throw new TRPCError({
+          code: 'NOT_FOUND',
+          message: 'Party not found',
+        });
+      }
+
       return party;
     }),
 
@@ -197,6 +204,13 @@ export const adminRouter = router({
         .where(eq(guests.id, input.id))
         .returning();
 
+      if (!guest) {
+        throw new TRPCError({
+          code: 'NOT_FOUND',
+          message: 'Guest not found',
+        });
+      }
+
       return guest;
     }),
 
@@ -269,6 +283,13 @@ export const adminRouter = router({
         })
         .where(eq(events.id, input.id))
         .returning();
+
+      if (!event) {
+        throw new TRPCError({
+          code: 'NOT_FOUND',
+          message: 'Event not found',
+        });
+      }
 
       return event;
     }),
