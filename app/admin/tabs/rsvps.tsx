@@ -14,6 +14,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { trpc } from '@/components/providers/trpc-provider';
+import { generateCSV, downloadCSV, csvFilename } from '@/lib/utils/csv';
 
 type SortField = 'guest' | 'party' | 'event' | 'status' | 'meal' | 'updated';
 type SortDirection = 'asc' | 'desc';
@@ -30,7 +31,7 @@ export function RsvpsTab() {
   const { data: rsvps, isLoading } = trpc.admin.listRsvps.useQuery();
   const { data: events } = trpc.admin.listEvents.useQuery();
 
-  const downloadCSV = () => {
+  const handleExportCSV = () => {
     if (!rsvps) return;
 
     const headers = [
@@ -52,16 +53,8 @@ export function RsvpsTab() {
       new Date(rsvp.updatedAt).toLocaleDateString(),
     ]);
 
-    const csv = [headers, ...rows]
-      .map((row) => row.map((cell) => `"${cell}"`).join(','))
-      .join('\n');
-    const blob = new Blob([csv], { type: 'text/csv' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `rsvps-${new Date().toISOString().split('T')[0]}.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
+    const csv = generateCSV(headers, rows);
+    downloadCSV(csvFilename('rsvps'), csv);
   };
 
   const getStatusBadge = (status: string) => {
@@ -215,7 +208,7 @@ export function RsvpsTab() {
                 </option>
               ))}
             </select>
-            <Button size="sm" variant="outline" onClick={downloadCSV}>
+            <Button size="sm" variant="outline" onClick={handleExportCSV}>
               Export CSV
             </Button>
           </div>

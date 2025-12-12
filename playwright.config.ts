@@ -6,6 +6,7 @@ import { dirname, join } from 'path';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
+const SITE_STORAGE_STATE = join(__dirname, 'tests/e2e/.auth/site.json');
 const ADMIN_STORAGE_STATE = join(__dirname, 'tests/e2e/.auth/admin.json');
 
 export default defineConfig({
@@ -27,13 +28,17 @@ export default defineConfig({
       name: 'setup',
       testMatch: /auth\.setup\.ts/,
     },
-    // Main tests that don't need admin auth
+    // Main tests - use site auth storage state
     {
       name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
+      use: {
+        ...devices['Desktop Chrome'],
+        storageState: SITE_STORAGE_STATE,
+      },
       testIgnore: /admin\.spec\.ts|admin-api\.spec\.ts|auth\.setup\.ts/,
+      dependencies: ['setup'],
     },
-    // Admin tests that need authentication
+    // Admin tests - use admin auth storage state
     {
       name: 'admin',
       use: {

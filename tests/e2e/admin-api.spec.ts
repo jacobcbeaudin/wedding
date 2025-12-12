@@ -10,25 +10,47 @@ import 'dotenv/config';
  * Admin authentication uses HttpOnly cookies set via /api/admin/login.
  */
 
+const SITE_PASSWORD = process.env.SITE_PASSWORD || 'test';
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'test';
 const NONEXISTENT_UUID = '00000000-0000-0000-0000-000000000000';
 
-// Helper to authenticate as admin and get session cookie
+// Helper to extract cookie from Set-Cookie header
+function extractCookie(setCookie: string | undefined, cookieName: string): string | null {
+  if (!setCookie) return null;
+  // Set-Cookie may be a single string or multiple cookies separated by comma
+  const cookies = setCookie.split(/,(?=\s*\w+=)/);
+  for (const cookie of cookies) {
+    if (cookie.trim().startsWith(`${cookieName}=`)) {
+      return cookie.split(';')[0].trim();
+    }
+  }
+  return null;
+}
+
+// Helper to authenticate as admin and get both site + admin session cookies
 async function authenticateAdmin(request: APIRequestContext): Promise<string> {
-  const response = await request.post('/api/admin/login', {
+  // First, authenticate with site password
+  const siteResponse = await request.post('/api/auth/login', {
+    headers: { 'Content-Type': 'application/json' },
+    data: { password: SITE_PASSWORD },
+  });
+  const siteCookie = extractCookie(siteResponse.headers()['set-cookie'], 'site_session');
+  if (!siteCookie) {
+    throw new Error('No site cookie returned from login');
+  }
+
+  // Then authenticate as admin
+  const adminResponse = await request.post('/api/admin/login', {
     headers: { 'Content-Type': 'application/json' },
     data: { password: ADMIN_PASSWORD },
   });
-
-  // Extract the Set-Cookie header
-  const setCookie = response.headers()['set-cookie'];
-  if (!setCookie) {
-    throw new Error('No cookie returned from login');
+  const adminCookie = extractCookie(adminResponse.headers()['set-cookie'], 'admin_session');
+  if (!adminCookie) {
+    throw new Error('No admin cookie returned from login');
   }
 
-  // Parse the cookie value (format: "admin_session=authenticated; Path=/; ...")
-  const cookieValue = setCookie.split(';')[0];
-  return cookieValue;
+  // Return both cookies
+  return `${siteCookie}; ${adminCookie}`;
 }
 
 // Helper to make tRPC mutation requests (POST) with auth cookie
@@ -189,7 +211,7 @@ test.describe('Admin API Error Handling', () => {
     test.use({ storageState: { cookies: [], origins: [] } }); // Clear auth for these tests
 
     test('returns UNAUTHORIZED when not authenticated', async ({ request }) => {
-      // Make request without authentication cookie
+      // Make request without any authentication cookie
       const response = await trpcMutation(request, 'admin.updateParty', {
         id: NONEXISTENT_UUID,
         name: 'Test',
@@ -197,7 +219,35 @@ test.describe('Admin API Error Handling', () => {
         notes: null,
       });
 
-      // tRPC returns 401 for UNAUTHORIZED errors
+      // Middleware returns 401 for missing site auth
+      expect(response.status()).toBe(401);
+      const body = await response.json();
+
+      expect(body.error).toBe('Site authentication required');
+    });
+
+    test('returns admin UNAUTHORIZED with site auth but no admin auth', async ({ request }) => {
+      // First, authenticate with site password only
+      const siteResponse = await request.post('/api/auth/login', {
+        headers: { 'Content-Type': 'application/json' },
+        data: { password: SITE_PASSWORD },
+      });
+      const siteCookie = extractCookie(siteResponse.headers()['set-cookie'], 'site_session');
+
+      // Make request with site auth but no admin auth
+      const response = await trpcMutation(
+        request,
+        'admin.updateParty',
+        {
+          id: NONEXISTENT_UUID,
+          name: 'Test',
+          email: 'test@example.com',
+          notes: null,
+        },
+        siteCookie || undefined
+      );
+
+      // tRPC returns 401 for admin UNAUTHORIZED errors
       expect(response.status()).toBe(401);
       const body = await response.json();
 
@@ -214,7 +264,7 @@ test.describe('Admin API Error Handling', () => {
 
       expect(response.status()).toBe(401);
       const body = await response.json();
-      expect(body.error).toBe('Invalid admin password');
+      expect(body.error).toBe('Incorrect password');
     });
 
     test('login succeeds with correct password', async ({ request }) => {

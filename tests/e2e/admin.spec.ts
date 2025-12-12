@@ -11,13 +11,7 @@ const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'test';
  */
 
 test.describe('Admin Panel', () => {
-  test.beforeEach(async ({ page }) => {
-    // Bypass site password
-    await page.goto('/');
-    await page.evaluate(() => {
-      sessionStorage.setItem('wedding_authenticated', 'true');
-    });
-  });
+  // Admin page has its own authentication - no site password needed
 
   test.describe('Authentication', () => {
     test.use({ storageState: { cookies: [], origins: [] } }); // Clear auth for login tests
@@ -39,7 +33,7 @@ test.describe('Admin Panel', () => {
       await page.goto('/admin');
       await page.getByLabel('Password').fill('wrongpassword');
       await page.getByRole('button', { name: 'Login' }).click();
-      await expect(page.getByText(/Invalid admin password/i)).toBeVisible();
+      await expect(page.getByText(/Incorrect password/i)).toBeVisible();
     });
 
     // Skip: This test conflicts with rate limiting (3 attempts/min) when run with other auth tests
@@ -47,7 +41,7 @@ test.describe('Admin Panel', () => {
       await page.goto('/admin');
       await page.getByLabel('Password').fill('wrongpassword');
       await page.getByRole('button', { name: 'Login' }).click();
-      await expect(page.getByText(/Invalid admin password/i)).toBeVisible();
+      await expect(page.getByText(/Incorrect password/i)).toBeVisible();
       // Password field should still have the value (user can retry)
       await expect(page.getByLabel('Password')).toHaveValue('wrongpassword');
     });

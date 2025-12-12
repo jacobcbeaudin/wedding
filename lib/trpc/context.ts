@@ -3,7 +3,7 @@
  */
 
 import type { FetchCreateContextFnOptions } from '@trpc/server/adapters/fetch';
-import { ADMIN_COOKIE_NAME, verifyAdminToken } from '@/lib/auth/admin';
+import { ADMIN_COOKIE_NAME, verifyAdminToken } from '@/lib/auth';
 
 export interface Context {
   ip: string;

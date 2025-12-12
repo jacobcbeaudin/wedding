@@ -3,18 +3,13 @@
 import { Check, X, Utensils } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { MEAL_OPTIONS, MEAL_REQUIRED_EVENT } from '@/lib/config/meals';
-import type { GuestPublic, EventPublic } from '@/lib/validations/rsvp';
-
-type RsvpStatus = 'attending' | 'declined';
-type MealChoice = (typeof MEAL_OPTIONS)[number];
-
-interface GuestEventRsvp {
-  guestId: string;
-  eventId: string;
-  eventSlug: string;
-  status: RsvpStatus | undefined;
-  mealChoice: MealChoice | undefined;
-}
+import type {
+  GuestPublic,
+  EventPublic,
+  GuestEventRsvp,
+  RsvpStatus,
+  MealChoice,
+} from '@/lib/validations/rsvp';
 
 interface RsvpEventCardProps {
   event: EventPublic;

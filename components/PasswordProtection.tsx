@@ -1,45 +1,25 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
-import { trpc } from '@/components/providers/trpc-provider';
+import { useSiteAuth } from '@/hooks/use-auth';
 
 interface PasswordProtectionProps {
   children: React.ReactNode;
 }
 
 export default function PasswordProtection({ children }: PasswordProtectionProps) {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  const { isAuthenticated, error, isLoading, login } = useSiteAuth();
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
 
-  useEffect(() => {
-    // Check sessionStorage after mount to avoid hydration mismatch
-    const authenticated = sessionStorage.getItem('wedding_authenticated') === 'true';
-    setIsAuthenticated(authenticated);
-  }, []);
-
-  const verifyMutation = trpc.auth.verify.useMutation({
-    onSuccess: () => {
-      sessionStorage.setItem('wedding_authenticated', 'true');
-      setIsAuthenticated(true);
-    },
-    onError: (err) => {
-      if (err.data?.code === 'TOO_MANY_REQUESTS') {
-        setError('Too many attempts. Please wait a moment and try again.');
-      } else {
-        setError('Incorrect password. Please check your invitation.');
-      }
-      setPassword('');
-    },
-  });
-
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
-    verifyMutation.mutate({ password });
+    const success = await login(password);
+    if (!success) {
+      setPassword('');
+    }
   };
 
   // Show nothing while checking auth status
@@ -82,7 +62,7 @@ export default function PasswordProtection({ children }: PasswordProtectionProps
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="text-center text-lg"
-              disabled={verifyMutation.isPending}
+              disabled={isLoading}
               data-testid="input-password"
             />
             {error && (
@@ -96,10 +76,10 @@ export default function PasswordProtection({ children }: PasswordProtectionProps
             type="submit"
             className="w-full"
             size="lg"
-            disabled={verifyMutation.isPending}
+            disabled={isLoading}
             data-testid="button-submit-password"
           >
-            {verifyMutation.isPending ? 'Checking...' : 'Enter Site'}
+            {isLoading ? 'Checking...' : 'Enter Site'}
           </Button>
         </form>
       </Card>
