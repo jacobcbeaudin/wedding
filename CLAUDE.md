@@ -276,13 +276,6 @@ QSTASH_NEXT_SIGNING_KEY=        # QStash signature verification
 - [ ] **FAQ page** - Replace placeholder FAQs
 - [ ] **Photo gallery** - Add real engagement/couple photos
 
-### Features (Future)
-
-- [ ] **RSVP reminder emails** - Send reminder to guests who haven't responded
-  - Add admin UI to trigger reminders
-  - Track `reminderSentAt` on parties table
-  - Only send to parties with no `submittedAt`
-
 ### Technical Improvements
 
 **Completed**
@@ -296,6 +289,32 @@ QSTASH_NEXT_SIGNING_KEY=        # QStash signature verification
 - [x] **HttpOnly cookies for admin auth** - Signed JWT tokens with XSS protection
 - [x] **Queue email sending** - Upstash QStash for background email processing with fallback to direct sending
 
-**Future (Nice to Have)**
+### Security Improvements
 
-- [ ] **Application monitoring** - Add Sentry or LogRocket for error tracking and performance monitoring.
+- [x] **Server-side site authentication** - Site password now uses HttpOnly cookie with signed JWT (like admin auth)
+  - Added `lib/auth/site.ts` with JWT utilities
+  - Added `/api/auth/login`, `/api/auth/session`, `/api/auth/logout` routes
+  - Updated `PasswordProtection.tsx` to use cookie-based auth
+  - Added `middleware.ts` to protect `/api/trpc/*` routes (requires site auth cookie)
+  - E2E tests use pre-authenticated storage state from setup
+  - CSRF protection via `sameSite: 'lax'` cookies (built-in)
+
+### User Experience
+
+- [x] **RSVP form auto-save** - Form state auto-saves to localStorage, survives page refresh
+  - Added `hooks/use-rsvp-draft.ts` for draft management
+  - Restores draft on page load with "Start fresh" option
+  - Clears draft on successful submission
+  - Error messages display prominently with clear styling
+
+### Features (Future)
+
+- [ ] **RSVP reminder emails** - Send reminder to guests who haven't responded
+  - Add admin UI to trigger reminders
+  - Track `reminderSentAt` on parties table
+- [ ] **Plus-one management** - Allow guests to add plus-ones if permitted
+- [ ] **QR code for RSVP link** - Generate unique access codes per party
+
+### Monitoring (Nice to Have)
+
+- [ ] **Add error tracking** - Integrate Sentry for error monitoring

@@ -128,3 +128,31 @@ export type PartyWithDetails = {
   }[];
   songRequests: SongRequestPublic[];
 };
+
+// ============================================================================
+// FORM STATE TYPES (for client-side RSVP form)
+// ============================================================================
+
+export type RsvpStatus = 'attending' | 'declined';
+export type MealChoice = (typeof MEAL_OPTIONS)[number];
+
+/** Form state for each guest's RSVP per event */
+export type GuestEventRsvp = {
+  guestId: string;
+  eventId: string;
+  eventSlug: string;
+  status: RsvpStatus | undefined;
+  mealChoice: MealChoice | undefined;
+};
+
+/** Form state for dietary restrictions per guest */
+export type GuestDietary = {
+  guestId: string;
+  dietaryRestrictions: string;
+};
+
+/** Form state for song requests (party-level) */
+export type SongRequestForm = {
+  song: string;
+  artist: string;
+};

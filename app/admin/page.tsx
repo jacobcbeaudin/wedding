@@ -1,12 +1,13 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { trpc } from '@/components/providers/trpc-provider';
+import { useAdminAuth } from '@/hooks/use-auth';
 import { PartiesTab } from './tabs/parties';
 import { GuestsTab } from './tabs/guests';
 import { EventsTab } from './tabs/events';
@@ -26,48 +27,15 @@ import {
 } from 'lucide-react';
 
 export default function AdminPage() {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  const { isAuthenticated, error, isLoading, login, logout } = useAdminAuth();
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const [isLoggingIn, setIsLoggingIn] = useState(false);
-
-  // Check session status on mount
-  useEffect(() => {
-    fetch('/api/admin/session')
-      .then((res) => res.json())
-      .then((data) => setIsAuthenticated(data.authenticated))
-      .catch(() => setIsAuthenticated(false));
-  }, []);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
-    setIsLoggingIn(true);
-
-    try {
-      const res = await fetch('/api/admin/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password }),
-      });
-      const data = await res.json();
-
-      if (res.ok) {
-        setIsAuthenticated(true);
-        setPassword('');
-      } else {
-        setError(data.error || 'Invalid password');
-      }
-    } catch {
-      setError('Something went wrong. Please try again.');
-    } finally {
-      setIsLoggingIn(false);
+    const success = await login(password);
+    if (success) {
+      setPassword('');
     }
-  };
-
-  const handleLogout = async () => {
-    await fetch('/api/admin/logout', { method: 'POST' });
-    setIsAuthenticated(false);
   };
 
   // Loading state
@@ -109,7 +77,7 @@ export default function AdminPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter admin password"
-                disabled={isLoggingIn}
+                disabled={isLoading}
                 className="mt-1"
               />
             </div>
@@ -118,8 +86,8 @@ export default function AdminPage() {
                 {error}
               </p>
             )}
-            <Button type="submit" className="w-full" disabled={!password || isLoggingIn}>
-              {isLoggingIn ? 'Logging in...' : 'Login'}
+            <Button type="submit" className="w-full" disabled={!password || isLoading}>
+              {isLoading ? 'Logging in...' : 'Login'}
             </Button>
           </form>
         </Card>
@@ -138,7 +106,7 @@ export default function AdminPage() {
             </div>
             <h1 className="text-lg font-semibold">Wedding Admin</h1>
           </div>
-          <Button variant="ghost" size="sm" onClick={handleLogout} className="gap-2">
+          <Button variant="ghost" size="sm" onClick={logout} className="gap-2">
             <LogOut className="h-4 w-4" />
             <span className="hidden sm:inline">Logout</span>
           </Button>

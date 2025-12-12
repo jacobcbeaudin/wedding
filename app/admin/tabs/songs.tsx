@@ -11,6 +11,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { trpc } from '@/components/providers/trpc-provider';
+import { generateCSV, downloadCSV, csvFilename } from '@/lib/utils/csv';
 
 export function SongsTab() {
   const utils = trpc.useUtils();
@@ -29,7 +30,7 @@ export function SongsTab() {
     }
   };
 
-  const downloadCSV = () => {
+  const handleExportCSV = () => {
     if (!songs) return;
 
     const headers = ['Song', 'Artist', 'Requested By', 'Requested At'];
@@ -40,16 +41,8 @@ export function SongsTab() {
       new Date(song.createdAt).toLocaleDateString(),
     ]);
 
-    const csv = [headers, ...rows]
-      .map((row) => row.map((cell) => `"${cell}"`).join(','))
-      .join('\n');
-    const blob = new Blob([csv], { type: 'text/csv' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `song-requests-${new Date().toISOString().split('T')[0]}.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
+    const csv = generateCSV(headers, rows);
+    downloadCSV(csvFilename('song-requests'), csv);
   };
 
   if (isLoading) {
@@ -60,7 +53,7 @@ export function SongsTab() {
     <Card className="p-4">
       <div className="mb-4 flex items-center justify-between">
         <h2 className="text-lg font-semibold">Song Requests ({songs?.length || 0})</h2>
-        <Button size="sm" variant="outline" onClick={downloadCSV} disabled={!songs?.length}>
+        <Button size="sm" variant="outline" onClick={handleExportCSV} disabled={!songs?.length}>
           Export CSV
         </Button>
       </div>

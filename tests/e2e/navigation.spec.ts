@@ -1,14 +1,7 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('Navigation', () => {
-  test.beforeEach(async ({ page }) => {
-    // Bypass password protection by setting session storage
-    await page.goto('/');
-    await page.evaluate(() => {
-      sessionStorage.setItem('wedding_authenticated', 'true');
-    });
-    await page.reload();
-  });
+  // Auth handled via storage state from setup
 
   test('can navigate to all main pages', async ({ page }) => {
     // Home

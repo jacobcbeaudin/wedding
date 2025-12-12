@@ -5,14 +5,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { MAX_SONG_REQUESTS } from '@/lib/config/rsvp';
-
-interface SongRequest {
-  song: string;
-  artist: string;
-}
+import type { SongRequestForm } from '@/lib/validations/rsvp';
 
 interface SongRequestsSectionProps {
-  songRequests: SongRequest[];
+  songRequests: SongRequestForm[];
   onSongChange: (index: number, field: 'song' | 'artist', value: string) => void;
   onAddSong: () => void;
   onRemoveSong: (index: number) => void;

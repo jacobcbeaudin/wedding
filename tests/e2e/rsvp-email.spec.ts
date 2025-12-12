@@ -18,13 +18,7 @@ test.describe('RSVP Email Confirmation Flow', () => {
     'Only run email tests in chromium to avoid duplicate sends'
   );
 
-  test.beforeEach(async ({ page }) => {
-    // Authenticate
-    await page.goto('/');
-    await page.evaluate(() => {
-      sessionStorage.setItem('wedding_authenticated', 'true');
-    });
-  });
+  // Auth handled via storage state from setup
 
   test('full RSVP submission flow shows confirmation', async ({ page }) => {
     // This test requires a seeded guest in the database

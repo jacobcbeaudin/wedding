@@ -1,16 +1,16 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import CoastalLayout from '@/components/CoastalLayout';
 import SectionDivider from '@/components/SectionDivider';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
+import { useRsvpForm } from '@/hooks/use-rsvp-form';
 import { trpc } from '@/components/providers/trpc-provider';
 import { RsvpFormSkeleton } from '@/components/RsvpSkeleton';
-import { MEAL_OPTIONS, MEAL_REQUIRED_EVENT } from '@/lib/config/meals';
-import { MAX_SONG_REQUESTS } from '@/lib/config/rsvp';
+import { MEAL_REQUIRED_EVENT } from '@/lib/config/meals';
 import {
   GuestLookupForm,
   RsvpEventCard,
@@ -18,55 +18,8 @@ import {
   SongRequestsSection,
   RsvpConfirmation,
 } from '@/components/rsvp';
-import type { PartyWithDetails, GuestPublic, RsvpResponse } from '@/lib/validations/rsvp';
-
-type RsvpStatus = 'attending' | 'declined';
-type MealChoice = (typeof MEAL_OPTIONS)[number];
-
-// Form state for each guest's RSVP per event
-interface GuestEventRsvp {
-  guestId: string;
-  eventId: string;
-  eventSlug: string;
-  status: RsvpStatus | undefined;
-  mealChoice: MealChoice | undefined;
-}
-
-// Form state for dietary restrictions per guest
-interface GuestDietary {
-  guestId: string;
-  dietaryRestrictions: string;
-}
-
-// Form state for song requests (party-level)
-interface SongRequest {
-  song: string;
-  artist: string;
-}
-
-// Helper to format guest names
-function capitalizeName(name: string) {
-  return name
-    .split(/(\s+|-)/g)
-    .map((part) => {
-      if (part === ' ' || part === '-') return part;
-      if (part.includes("'")) {
-        const [before, after] = part.split("'");
-        return (
-          before.charAt(0).toUpperCase() +
-          before.slice(1) +
-          "'" +
-          (after.charAt(0).toUpperCase() + after.slice(1))
-        );
-      }
-      return part.charAt(0).toUpperCase() + part.slice(1);
-    })
-    .join('');
-}
-
-function formatGuestName(guest: GuestPublic) {
-  return `${capitalizeName(guest.firstName)} ${capitalizeName(guest.lastName)}`;
-}
+import type { PartyWithDetails, RsvpResponse, RsvpStatus } from '@/lib/validations/rsvp';
+import { formatGuestName } from '@/lib/utils/formatting';
 
 export default function RSVP() {
   const { toast } = useToast();
@@ -77,11 +30,30 @@ export default function RSVP() {
   const [lookupError, setLookupError] = useState('');
   const [submitError, setSubmitError] = useState('');
 
-  // Form state
-  const [rsvpSelections, setRsvpSelections] = useState<GuestEventRsvp[]>([]);
-  const [dietaryInfo, setDietaryInfo] = useState<GuestDietary[]>([]);
-  const [songRequests, setSongRequests] = useState<SongRequest[]>([]);
-  const [notes, setNotes] = useState('');
+  // Form state from hook
+  const {
+    rsvpSelections,
+    dietaryInfo,
+    songRequests,
+    notes,
+    draftRestored,
+    initializeFormState,
+    updateRsvpSelection,
+    updateMealChoice,
+    updateDietary,
+    updateSongRequest,
+    addSongRequest,
+    removeSongRequest,
+    setNotes,
+    saveDraft,
+    clearDraft,
+  } = useRsvpForm(party?.id ?? null);
+
+  // Auto-save form state to localStorage when it changes
+  useEffect(() => {
+    if (!party || step !== 'form') return;
+    saveDraft();
+  }, [rsvpSelections, dietaryInfo, songRequests, notes, party, step, saveDraft]);
 
   const lookupMutation = trpc.rsvp.lookup.useMutation({
     onSuccess: (data) => {
@@ -101,6 +73,7 @@ export default function RSVP() {
 
   const submitMutation = trpc.rsvp.submit.useMutation({
     onSuccess: (data) => {
+      clearDraft(); // Clear saved draft on success
       setParty(data.party);
       setStep('confirmation');
       toast({
@@ -112,44 +85,6 @@ export default function RSVP() {
       setSubmitError(err.message || 'Something went wrong. Please try again.');
     },
   });
-
-  const initializeFormState = (partyData: PartyWithDetails) => {
-    // Initialize RSVP selections from existing data
-    const initialRsvps: GuestEventRsvp[] = [];
-    for (const { event, rsvps } of partyData.invitedEvents) {
-      for (const guest of partyData.guests) {
-        const existingRsvp = rsvps.find((r) => r.guestId === guest.id);
-        initialRsvps.push({
-          guestId: guest.id,
-          eventId: event.id,
-          eventSlug: event.slug,
-          status:
-            existingRsvp?.status === 'pending' || !existingRsvp
-              ? undefined
-              : (existingRsvp.status as RsvpStatus),
-          mealChoice: existingRsvp?.mealChoice as MealChoice | undefined,
-        });
-      }
-    }
-    setRsvpSelections(initialRsvps);
-
-    // Initialize dietary info
-    const initialDietary: GuestDietary[] = partyData.guests.map((guest) => ({
-      guestId: guest.id,
-      dietaryRestrictions: guest.dietaryRestrictions || '',
-    }));
-    setDietaryInfo(initialDietary);
-
-    // Initialize song requests from existing data
-    const existingSongs = partyData.songRequests.map((sr) => ({
-      song: sr.song,
-      artist: sr.artist || '',
-    }));
-    setSongRequests(existingSongs.length > 0 ? existingSongs : [{ song: '', artist: '' }]);
-
-    // Initialize notes
-    setNotes(partyData.notes || '');
-  };
 
   const handleLookup = () => {
     setLookupError('');
@@ -214,44 +149,6 @@ export default function RSVP() {
     });
   };
 
-  const updateRsvpSelection = (guestId: string, eventId: string, status: RsvpStatus) => {
-    setRsvpSelections((prev) =>
-      prev.map((r) =>
-        r.guestId === guestId && r.eventId === eventId
-          ? { ...r, status, mealChoice: status === 'declined' ? undefined : r.mealChoice }
-          : r
-      )
-    );
-  };
-
-  const updateMealChoice = (guestId: string, eventId: string, meal: MealChoice) => {
-    setRsvpSelections((prev) =>
-      prev.map((r) =>
-        r.guestId === guestId && r.eventId === eventId ? { ...r, mealChoice: meal } : r
-      )
-    );
-  };
-
-  const updateDietary = (guestId: string, value: string) => {
-    setDietaryInfo((prev) =>
-      prev.map((d) => (d.guestId === guestId ? { ...d, dietaryRestrictions: value } : d))
-    );
-  };
-
-  const updateSongRequest = (index: number, field: 'song' | 'artist', value: string) => {
-    setSongRequests((prev) => prev.map((s, i) => (i === index ? { ...s, [field]: value } : s)));
-  };
-
-  const addSongRequest = () => {
-    if (songRequests.length < MAX_SONG_REQUESTS) {
-      setSongRequests((prev) => [...prev, { song: '', artist: '' }]);
-    }
-  };
-
-  const removeSongRequest = (index: number) => {
-    setSongRequests((prev) => prev.filter((_, i) => i !== index));
-  };
-
   // Loading screen
   if (step === 'loading') {
     return (
@@ -307,6 +204,25 @@ export default function RSVP() {
           </div>
 
           <SectionDivider />
+
+          {/* Draft Restored Notice */}
+          {draftRestored && (
+            <div className="bg-primary/5 border-primary/20 mb-6 rounded-lg border p-4 text-sm">
+              <p className="text-foreground">
+                We restored your previous selections. You can continue where you left off.
+              </p>
+              <button
+                type="button"
+                className="text-primary hover:text-primary/80 mt-1 text-sm underline"
+                onClick={() => {
+                  clearDraft();
+                  if (party) initializeFormState(party);
+                }}
+              >
+                Start fresh instead
+              </button>
+            </div>
+          )}
 
           {/* Party Welcome */}
           <Card className="coastal-shadow mb-6 border-0 p-6 sm:mb-8 sm:p-8">
@@ -381,7 +297,9 @@ export default function RSVP() {
           </Card>
 
           {submitError && (
-            <p className="text-destructive mb-6 text-center text-sm">{submitError}</p>
+            <div className="bg-destructive/10 border-destructive/20 mb-6 rounded-lg border p-4">
+              <p className="text-destructive text-sm font-medium">{submitError}</p>
+            </div>
           )}
 
           <div className="flex flex-col justify-center gap-3 sm:flex-row sm:gap-4">

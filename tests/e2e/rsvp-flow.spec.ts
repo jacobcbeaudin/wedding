@@ -16,13 +16,7 @@ test.describe('RSVP Complete Flow', () => {
   // Run serially to avoid race conditions with parallel DB access
   test.describe.configure({ mode: 'serial' });
 
-  test.beforeEach(async ({ page }) => {
-    // Bypass site password
-    await page.goto('/');
-    await page.evaluate(() => {
-      sessionStorage.setItem('wedding_authenticated', 'true');
-    });
-  });
+  // Auth handled via storage state from setup
 
   test.describe('Guest Lookup', () => {
     test('finds guest by exact name', async ({ page }) => {

@@ -2,10 +2,6 @@ import { test, expect } from '@playwright/test';
 
 test.describe('RSVP Flow', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/');
-    await page.evaluate(() => {
-      sessionStorage.setItem('wedding_authenticated', 'true');
-    });
     await page.goto('/rsvp');
   });
 
