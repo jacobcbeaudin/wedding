@@ -12,7 +12,6 @@ const photos = [
   { src: '/images/photo-02.webp', alt: 'Photo 2' },
   { src: '/images/photo-03.webp', alt: 'Photo 3' },
   { src: '/images/photo-04.webp', alt: 'Photo 4' },
-  { src: '/images/photo-05.webp', alt: 'Photo 5' },
 ];
 
 export default function Photos() {

@@ -68,7 +68,7 @@ export default function AdminPage() {
       <div
         className="flex min-h-screen items-center justify-center p-4"
         style={{
-          backgroundImage: `url(/images/photo-06.webp)`,
+          backgroundImage: `url(/images/photo-05.webp)`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
         }}

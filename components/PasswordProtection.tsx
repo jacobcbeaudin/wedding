@@ -55,7 +55,7 @@ export default function PasswordProtection({ children }: PasswordProtectionProps
     <div
       className="flex min-h-screen items-center justify-center p-6"
       style={{
-        backgroundImage: `url(/images/photo-06.webp)`,
+        backgroundImage: `url(/images/photo-05.webp)`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
       }}

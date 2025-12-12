@@ -28,6 +28,7 @@ import {
 import { RSVP_DEADLINE } from '@/lib/config/rsvp';
 import { MEAL_REQUIRED_EVENT } from '@/lib/config/meals';
 import { normalizeName, sanitizeText } from '@/lib/trpc/utils';
+import { sendRsvpConfirmation } from '@/lib/email';
 
 // ============================================================================
 // HELPER FUNCTIONS
@@ -357,6 +358,39 @@ export const rsvpRouter = router({
 
     // Return updated party data
     const updatedParty = await fetchPartyWithDetails(partyId);
+
+    // Send confirmation email (non-blocking, don't fail RSVP if email fails)
+    const emailData = {
+      partyEmail: party.email,
+      guests: updatedParty.guests.map((guest) => ({
+        name: `${guest.firstName} ${guest.lastName}`,
+        responses: updatedParty.invitedEvents
+          .map(({ event, rsvps: eventRsvps }) => {
+            const rsvp = eventRsvps.find((r) => r.guestId === guest.id);
+            if (!rsvp || rsvp.status === 'pending') return null;
+            return {
+              eventName: event.name,
+              status: rsvp.status as 'attending' | 'declined',
+              mealChoice: rsvp.mealChoice,
+            };
+          })
+          .filter((r): r is NonNullable<typeof r> => r !== null),
+        dietaryRestrictions: guest.dietaryRestrictions,
+      })),
+      songRequests: updatedParty.songRequests.map((s) => ({
+        song: s.song,
+        artist: s.artist,
+      })),
+      notes: updatedParty.notes,
+    };
+
+    const emailSent = await sendRsvpConfirmation(emailData);
+
+    // Update confirmationSentAt if email was sent successfully
+    if (emailSent) {
+      await db.update(parties).set({ confirmationSentAt: now }).where(eq(parties.id, partyId));
+    }
+
     return {
       success: true,
       party: updatedParty,

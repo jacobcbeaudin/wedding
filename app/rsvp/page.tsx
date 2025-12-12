@@ -12,6 +12,7 @@ import { Check, X, Utensils } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
 import { trpc } from '@/components/providers/trpc-provider';
+import { RsvpFormSkeleton } from '@/components/RsvpSkeleton';
 import { MEAL_OPTIONS, MEAL_REQUIRED_EVENT } from '@/lib/config/meals';
 import { MAX_SONG_REQUESTS } from '@/lib/config/rsvp';
 import type {
@@ -47,7 +48,7 @@ interface SongRequest {
 
 export default function RSVP() {
   const { toast } = useToast();
-  const [step, setStep] = useState<'lookup' | 'form' | 'confirmation'>('lookup');
+  const [step, setStep] = useState<'lookup' | 'loading' | 'form' | 'confirmation'>('lookup');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [party, setParty] = useState<PartyWithDetails | null>(null);
@@ -68,6 +69,7 @@ export default function RSVP() {
       setStep('form');
     },
     onError: (err) => {
+      setStep('lookup');
       setLookupError(
         err.message ||
           "We couldn't find your name. Please check the spelling matches your invitation."
@@ -129,6 +131,7 @@ export default function RSVP() {
 
   const handleLookup = () => {
     setLookupError('');
+    setStep('loading');
     lookupMutation.mutate({ firstName, lastName });
   };
 
@@ -261,6 +264,26 @@ export default function RSVP() {
       minute: '2-digit',
     });
   };
+
+  // Loading screen
+  if (step === 'loading') {
+    return (
+      <CoastalLayout>
+        <div className="container mx-auto max-w-4xl px-6 py-12 sm:py-20">
+          <div className="mb-12 text-center">
+            <h1 className="elegant-serif text-foreground mb-6 text-4xl font-light sm:text-5xl md:text-6xl">
+              RSVP
+            </h1>
+            <p className="text-muted-foreground text-base sm:text-lg">Finding your invitation...</p>
+          </div>
+
+          <SectionDivider />
+
+          <RsvpFormSkeleton />
+        </div>
+      </CoastalLayout>
+    );
+  }
 
   // Confirmation screen
   if (step === 'confirmation' && party) {
