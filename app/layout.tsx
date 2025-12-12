@@ -4,6 +4,7 @@ import { TRPCProvider } from '@/components/providers/trpc-provider';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { Toaster } from '@/components/ui/toaster';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
+import { Analytics } from '@vercel/analytics/next';
 import './globals.css';
 
 // Optimized font loading - self-hosted, no layout shift
@@ -49,6 +50,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <TooltipProvider>
             <ErrorBoundary>{children}</ErrorBoundary>
             <Toaster />
+            <Analytics />
           </TooltipProvider>
         </TRPCProvider>
       </body>
