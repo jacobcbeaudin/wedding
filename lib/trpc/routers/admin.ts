@@ -6,7 +6,7 @@ import { z } from 'zod';
 import { eq, desc, asc } from 'drizzle-orm';
 import { Ratelimit } from '@upstash/ratelimit';
 import { Redis } from '@upstash/redis';
-import { router, publicProcedure, TRPCError } from '../init';
+import { router, publicProcedure, adminProcedure, TRPCError } from '../init';
 import { db } from '@/lib/db';
 import { parties, guests, events, invitations, rsvps, songRequests } from '@/lib/db/schema';
 
@@ -19,23 +19,6 @@ const adminRatelimit = process.env.UPSTASH_REDIS_REST_URL
       prefix: 'wedding:admin',
     })
   : null;
-
-// Helper to verify admin authentication
-function verifyAdmin(adminToken: string | undefined) {
-  const adminPassword = process.env.ADMIN_PASSWORD;
-  if (!adminPassword) {
-    throw new TRPCError({
-      code: 'INTERNAL_SERVER_ERROR',
-      message: 'Admin not configured',
-    });
-  }
-  if (!adminToken || adminToken !== adminPassword) {
-    throw new TRPCError({
-      code: 'UNAUTHORIZED',
-      message: 'Invalid admin credentials',
-    });
-  }
-}
 
 export const adminRouter = router({
   // ============================================================================
@@ -78,38 +61,31 @@ export const adminRouter = router({
   // PARTIES
   // ============================================================================
 
-  listParties: publicProcedure
-    .input(z.object({ adminToken: z.string() }))
-    .query(async ({ input }) => {
-      verifyAdmin(input.adminToken);
-
-      const result = await db.query.parties.findMany({
-        orderBy: [asc(parties.name)],
-        with: {
-          guests: true,
-          invitations: {
-            with: {
-              event: true,
-            },
+  listParties: adminProcedure.query(async () => {
+    const result = await db.query.parties.findMany({
+      orderBy: [asc(parties.name)],
+      with: {
+        guests: true,
+        invitations: {
+          with: {
+            event: true,
           },
         },
-      });
+      },
+    });
 
-      return result;
-    }),
+    return result;
+  }),
 
-  createParty: publicProcedure
+  createParty: adminProcedure
     .input(
       z.object({
-        adminToken: z.string(),
         name: z.string().min(1),
         email: z.email(),
         notes: z.string().nullable(),
       })
     )
     .mutation(async ({ input }) => {
-      verifyAdmin(input.adminToken);
-
       const [party] = await db
         .insert(parties)
         .values({
@@ -122,10 +98,9 @@ export const adminRouter = router({
       return party;
     }),
 
-  updateParty: publicProcedure
+  updateParty: adminProcedure
     .input(
       z.object({
-        adminToken: z.string(),
         id: z.uuid(),
         name: z.string().min(1),
         email: z.email(),
@@ -133,8 +108,6 @@ export const adminRouter = router({
       })
     )
     .mutation(async ({ input }) => {
-      verifyAdmin(input.adminToken);
-
       const [party] = await db
         .update(parties)
         .set({
@@ -148,43 +121,34 @@ export const adminRouter = router({
       return party;
     }),
 
-  deleteParty: publicProcedure
-    .input(z.object({ adminToken: z.string(), id: z.uuid() }))
-    .mutation(async ({ input }) => {
-      verifyAdmin(input.adminToken);
-
-      await db.delete(parties).where(eq(parties.id, input.id));
-      return { success: true };
-    }),
+  deleteParty: adminProcedure.input(z.object({ id: z.uuid() })).mutation(async ({ input }) => {
+    await db.delete(parties).where(eq(parties.id, input.id));
+    return { success: true };
+  }),
 
   // ============================================================================
   // GUESTS
   // ============================================================================
 
-  listGuests: publicProcedure
-    .input(z.object({ adminToken: z.string() }))
-    .query(async ({ input }) => {
-      verifyAdmin(input.adminToken);
-
-      const result = await db.query.guests.findMany({
-        orderBy: [asc(guests.lastName), asc(guests.firstName)],
-        with: {
-          party: true,
-          rsvps: {
-            with: {
-              event: true,
-            },
+  listGuests: adminProcedure.query(async () => {
+    const result = await db.query.guests.findMany({
+      orderBy: [asc(guests.lastName), asc(guests.firstName)],
+      with: {
+        party: true,
+        rsvps: {
+          with: {
+            event: true,
           },
         },
-      });
+      },
+    });
 
-      return result;
-    }),
+    return result;
+  }),
 
-  createGuest: publicProcedure
+  createGuest: adminProcedure
     .input(
       z.object({
-        adminToken: z.string(),
         partyId: z.uuid(),
         firstName: z.string().min(1),
         lastName: z.string().min(1),
@@ -194,8 +158,6 @@ export const adminRouter = router({
       })
     )
     .mutation(async ({ input }) => {
-      verifyAdmin(input.adminToken);
-
       const [guest] = await db
         .insert(guests)
         .values({
@@ -211,10 +173,9 @@ export const adminRouter = router({
       return guest;
     }),
 
-  updateGuest: publicProcedure
+  updateGuest: adminProcedure
     .input(
       z.object({
-        adminToken: z.string(),
         id: z.uuid(),
         firstName: z.string().min(1),
         lastName: z.string().min(1),
@@ -224,8 +185,6 @@ export const adminRouter = router({
       })
     )
     .mutation(async ({ input }) => {
-      verifyAdmin(input.adminToken);
-
       const [guest] = await db
         .update(guests)
         .set({
@@ -241,35 +200,26 @@ export const adminRouter = router({
       return guest;
     }),
 
-  deleteGuest: publicProcedure
-    .input(z.object({ adminToken: z.string(), id: z.uuid() }))
-    .mutation(async ({ input }) => {
-      verifyAdmin(input.adminToken);
-
-      await db.delete(guests).where(eq(guests.id, input.id));
-      return { success: true };
-    }),
+  deleteGuest: adminProcedure.input(z.object({ id: z.uuid() })).mutation(async ({ input }) => {
+    await db.delete(guests).where(eq(guests.id, input.id));
+    return { success: true };
+  }),
 
   // ============================================================================
   // EVENTS
   // ============================================================================
 
-  listEvents: publicProcedure
-    .input(z.object({ adminToken: z.string() }))
-    .query(async ({ input }) => {
-      verifyAdmin(input.adminToken);
+  listEvents: adminProcedure.query(async () => {
+    const result = await db.query.events.findMany({
+      orderBy: [asc(events.displayOrder)],
+    });
 
-      const result = await db.query.events.findMany({
-        orderBy: [asc(events.displayOrder)],
-      });
+    return result;
+  }),
 
-      return result;
-    }),
-
-  createEvent: publicProcedure
+  createEvent: adminProcedure
     .input(
       z.object({
-        adminToken: z.string(),
         slug: z.string().min(1),
         name: z.string().min(1),
         date: z.string().nullable(),
@@ -279,8 +229,6 @@ export const adminRouter = router({
       })
     )
     .mutation(async ({ input }) => {
-      verifyAdmin(input.adminToken);
-
       const [event] = await db
         .insert(events)
         .values({
@@ -296,10 +244,9 @@ export const adminRouter = router({
       return event;
     }),
 
-  updateEvent: publicProcedure
+  updateEvent: adminProcedure
     .input(
       z.object({
-        adminToken: z.string(),
         id: z.uuid(),
         slug: z.string().min(1),
         name: z.string().min(1),
@@ -310,8 +257,6 @@ export const adminRouter = router({
       })
     )
     .mutation(async ({ input }) => {
-      verifyAdmin(input.adminToken);
-
       const [event] = await db
         .update(events)
         .set({
@@ -328,45 +273,34 @@ export const adminRouter = router({
       return event;
     }),
 
-  deleteEvent: publicProcedure
-    .input(z.object({ adminToken: z.string(), id: z.uuid() }))
-    .mutation(async ({ input }) => {
-      verifyAdmin(input.adminToken);
-
-      await db.delete(events).where(eq(events.id, input.id));
-      return { success: true };
-    }),
+  deleteEvent: adminProcedure.input(z.object({ id: z.uuid() })).mutation(async ({ input }) => {
+    await db.delete(events).where(eq(events.id, input.id));
+    return { success: true };
+  }),
 
   // ============================================================================
   // INVITATIONS
   // ============================================================================
 
-  listInvitations: publicProcedure
-    .input(z.object({ adminToken: z.string() }))
-    .query(async ({ input }) => {
-      verifyAdmin(input.adminToken);
+  listInvitations: adminProcedure.query(async () => {
+    const result = await db.query.invitations.findMany({
+      with: {
+        party: true,
+        event: true,
+      },
+    });
 
-      const result = await db.query.invitations.findMany({
-        with: {
-          party: true,
-          event: true,
-        },
-      });
+    return result;
+  }),
 
-      return result;
-    }),
-
-  createInvitation: publicProcedure
+  createInvitation: adminProcedure
     .input(
       z.object({
-        adminToken: z.string(),
         partyId: z.uuid(),
         eventId: z.uuid(),
       })
     )
     .mutation(async ({ input }) => {
-      verifyAdmin(input.adminToken);
-
       const [invitation] = await db
         .insert(invitations)
         .values({
@@ -378,27 +312,19 @@ export const adminRouter = router({
       return invitation;
     }),
 
-  deleteInvitation: publicProcedure
-    .input(z.object({ adminToken: z.string(), id: z.uuid() }))
-    .mutation(async ({ input }) => {
-      verifyAdmin(input.adminToken);
+  deleteInvitation: adminProcedure.input(z.object({ id: z.uuid() })).mutation(async ({ input }) => {
+    await db.delete(invitations).where(eq(invitations.id, input.id));
+    return { success: true };
+  }),
 
-      await db.delete(invitations).where(eq(invitations.id, input.id));
-      return { success: true };
-    }),
-
-  // Bulk invite a party to multiple events
-  bulkInvite: publicProcedure
+  bulkInvite: adminProcedure
     .input(
       z.object({
-        adminToken: z.string(),
         partyId: z.uuid(),
         eventIds: z.array(z.uuid()),
       })
     )
     .mutation(async ({ input }) => {
-      verifyAdmin(input.adminToken);
-
       // Delete existing invitations for this party
       await db.delete(invitations).where(eq(invitations.partyId, input.partyId));
 
@@ -419,50 +345,40 @@ export const adminRouter = router({
   // RSVPS
   // ============================================================================
 
-  listRsvps: publicProcedure
-    .input(z.object({ adminToken: z.string() }))
-    .query(async ({ input }) => {
-      verifyAdmin(input.adminToken);
-
-      const result = await db.query.rsvps.findMany({
-        orderBy: [desc(rsvps.updatedAt)],
-        with: {
-          guest: {
-            with: {
-              party: true,
-            },
+  listRsvps: adminProcedure.query(async () => {
+    const result = await db.query.rsvps.findMany({
+      orderBy: [desc(rsvps.updatedAt)],
+      with: {
+        guest: {
+          with: {
+            party: true,
           },
-          event: true,
         },
-      });
+        event: true,
+      },
+    });
 
-      return result;
-    }),
+    return result;
+  }),
 
   // ============================================================================
   // SONG REQUESTS
   // ============================================================================
 
-  listSongRequests: publicProcedure
-    .input(z.object({ adminToken: z.string() }))
-    .query(async ({ input }) => {
-      verifyAdmin(input.adminToken);
+  listSongRequests: adminProcedure.query(async () => {
+    const result = await db.query.songRequests.findMany({
+      orderBy: [desc(songRequests.createdAt)],
+      with: {
+        party: true,
+      },
+    });
 
-      const result = await db.query.songRequests.findMany({
-        orderBy: [desc(songRequests.createdAt)],
-        with: {
-          party: true,
-        },
-      });
+    return result;
+  }),
 
-      return result;
-    }),
-
-  deleteSongRequest: publicProcedure
-    .input(z.object({ adminToken: z.string(), id: z.uuid() }))
+  deleteSongRequest: adminProcedure
+    .input(z.object({ id: z.uuid() }))
     .mutation(async ({ input }) => {
-      verifyAdmin(input.adminToken);
-
       await db.delete(songRequests).where(eq(songRequests.id, input.id));
       return { success: true };
     }),
@@ -471,34 +387,30 @@ export const adminRouter = router({
   // DASHBOARD STATS
   // ============================================================================
 
-  getDashboardStats: publicProcedure
-    .input(z.object({ adminToken: z.string() }))
-    .query(async ({ input }) => {
-      verifyAdmin(input.adminToken);
+  getDashboardStats: adminProcedure.query(async () => {
+    const [allParties, allGuests, allEvents, allRsvps, allSongRequests] = await Promise.all([
+      db.query.parties.findMany(),
+      db.query.guests.findMany(),
+      db.query.events.findMany(),
+      db.query.rsvps.findMany(),
+      db.query.songRequests.findMany(),
+    ]);
 
-      const [allParties, allGuests, allEvents, allRsvps, allSongRequests] = await Promise.all([
-        db.query.parties.findMany(),
-        db.query.guests.findMany(),
-        db.query.events.findMany(),
-        db.query.rsvps.findMany(),
-        db.query.songRequests.findMany(),
-      ]);
+    const partiesWithSubmission = allParties.filter((p) => p.submittedAt);
+    const attendingRsvps = allRsvps.filter((r) => r.status === 'attending');
+    const declinedRsvps = allRsvps.filter((r) => r.status === 'declined');
+    const pendingRsvps = allRsvps.filter((r) => r.status === 'pending');
 
-      const partiesWithSubmission = allParties.filter((p) => p.submittedAt);
-      const attendingRsvps = allRsvps.filter((r) => r.status === 'attending');
-      const declinedRsvps = allRsvps.filter((r) => r.status === 'declined');
-      const pendingRsvps = allRsvps.filter((r) => r.status === 'pending');
-
-      return {
-        totalParties: allParties.length,
-        partiesResponded: partiesWithSubmission.length,
-        totalGuests: allGuests.length,
-        totalEvents: allEvents.length,
-        totalRsvps: allRsvps.length,
-        attendingCount: attendingRsvps.length,
-        declinedCount: declinedRsvps.length,
-        pendingCount: pendingRsvps.length,
-        songRequestCount: allSongRequests.length,
-      };
-    }),
+    return {
+      totalParties: allParties.length,
+      partiesResponded: partiesWithSubmission.length,
+      totalGuests: allGuests.length,
+      totalEvents: allEvents.length,
+      totalRsvps: allRsvps.length,
+      attendingCount: attendingRsvps.length,
+      declinedCount: declinedRsvps.length,
+      pendingCount: pendingRsvps.length,
+      songRequestCount: allSongRequests.length,
+    };
+  }),
 });
