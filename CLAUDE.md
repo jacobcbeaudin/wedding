@@ -207,6 +207,7 @@ RESEND_API_KEY=           # Resend API key (not yet implemented)
 
 ### Core Features (Complete)
 - [x] **RSVP System** - Guest lookup, party-based flow, multi-event RSVPs
+- [x] **RSVP Confirmation Emails** - Sent via Resend after submission
 - [x] **Meal Selection** - Fish, Beef, Vegetarian options for wedding event
 - [x] **Dietary Restrictions** - Per-guest dietary tracking
 - [x] **Song Requests** - Max 3 per party with artist/title
@@ -242,9 +243,8 @@ RESEND_API_KEY=           # Resend API key (not yet implemented)
 - [ ] **FAQ page** - Replace placeholder FAQs
 - [ ] **Photo gallery** - Add real engagement/couple photos
 
-### Features (In Progress)
-- [ ] **RSVP confirmation emails** - Send email via Resend after submission
-  - Add `RESEND_API_KEY` to environment
-  - Create email template in `lib/email/`
-  - Call from `rsvp.submit` procedure
-  - Update `confirmationSentAt` field on parties table
+### Features (Future)
+- [ ] **RSVP reminder emails** - Send reminder to guests who haven't responded
+  - Add admin UI to trigger reminders
+  - Track `reminderSentAt` on parties table
+  - Only send to parties with no `submittedAt`
